@@ -3,56 +3,56 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "logicAppName": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80,
-          "metadata": {
-            "description": "Name of the Logic App."
-          }
-        },
-        "logicAppLocation": {
-          "type": "string",
-          "defaultValue": "[resourceGroup().location]",
-          "allowedValues": [
-            "[resourceGroup().location]",
-            "eastasia",
-            "southeastasia",
-            "centralus",
-            "eastus",
-            "eastus2",
-            "westus",
-            "northcentralus",
-            "southcentralus",
-            "northeurope",
-            "westeurope",
-            "japanwest",
-            "japaneast",
-            "brazilsouth",
-            "australiaeast",
-            "australiasoutheast",
-            "southindia",
-            "centralindia",
-            "westindia",
-            "canadacentral",
-            "canadaeast",
-            "uksouth",
-            "ukwest",
-            "westcentralus",
-            "westus2",
-            "koreacentral",
-            "koreasouth",
-            "francecentral",
-            "francesouth",
-            "southafricanorth",
-            "southafricawest"
-          ],
-          "metadata": {
-            "description": "Location of the Logic App."
-          }
-        },
-        "connections": {
-            "type": "Object"
-        }
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "metadata": {
+              "description": "Name of the Logic App."
+            }
+          },
+          "logicAppLocation": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "allowedValues": [
+              "[resourceGroup().location]",
+              "eastasia",
+              "southeastasia",
+              "centralus",
+              "eastus",
+              "eastus2",
+              "westus",
+              "northcentralus",
+              "southcentralus",
+              "northeurope",
+              "westeurope",
+              "japanwest",
+              "japaneast",
+              "brazilsouth",
+              "australiaeast",
+              "australiasoutheast",
+              "southindia",
+              "centralindia",
+              "westindia",
+              "canadacentral",
+              "canadaeast",
+              "uksouth",
+              "ukwest",
+              "westcentralus",
+              "westus2",
+              "koreacentral",
+              "koreasouth",
+              "francecentral",
+              "francesouth",
+              "southafricanorth",
+              "southafricawest"
+            ],
+            "metadata": {
+              "description": "Location of the Logic App."
+            }
+          },
+          "connections": {
+              "type": "Object"
+          }  
     },
     "resources": [
         {
@@ -83,8 +83,8 @@
                     "triggers": {
                         "When_a_new_issue_is_returned_by_a_JQL_query": {
                             "recurrence": {
-                                "frequency": "Hour",
-                                "interval": 4
+                                "frequency": "Minute",
+                                "interval": 10
                             },
                             "splitOn": "@triggerBody()",
                             "type": "ApiConnection",
@@ -97,37 +97,21 @@
                                 "method": "get",
                                 "path": "/new_issue_jql_trigger/search",
                                 "queries": {
-                                    "jql": "project = VP AND labels in (Support, Operations, AK19) AND (development[commits].all > 0 or Labels in (CodeChanged)) AND status changed to (Done, \"Support Review\") during (startOfWeek(), endOfWeek())  AND NOT status changed to (Done, \"Support Review\") before startOfWeek() and status changed from Testing to (\"To Do\", \"In Progress\")"
+                                    "jql": "project = \"VP\" and (Labels in (AK19, AlphaBravo)  OR issuetype=Story and reporter=5cc15cbd788c400fcdcec202) AND reporter not in (5cee9b2fad53410f201a2adf, 5cda71911b6dba0dc52c0155, 5cee9be899c4f60fa5fb9c58, 5cee9b9db457f80f23adb3bf) and status changed to \"Done\" after startOfWeek() and not status changed  to \"Done\" before startOfWeek() ORDER BY priority DESC"
                                 }
                             }
                         }
                     },
                     "actions": {
-                        "Initialize_variable": {
-                            "runAfter": {},
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "FormURI",
-                                        "type": "string",
-                                        "value": "https://docs.google.com/forms/d/e/1FAIpQLSdR94znp-Qr_9gSLX7mcXsqRY1A_T5Xos2vBMfPvjjVtRPutw/viewform?usp=pp_url&entry.1609313066=@{triggerBody()?['self']}"
-                                    }
-                                ]
-                            }
-                        },
                         "Send_an_email_(V2)": {
-                            "runAfter": {
-                                "Initialize_variable": [
-                                    "Succeeded"
-                                ]
-                            },
+                            "runAfter": {},
                             "type": "ApiConnection",
                             "inputs": {
                                 "body": {
-                                    "Body": "<p>The issue @{concat('<a href=', triggerBody()?['self'], '>', triggerBody()?['key'], ': ', triggerBody()?['fields']?['summary'], '</a>')} was rejected by QA. Please provide root-cause analysis for this occasion @{concat('<a href=', variables('FormURI'), '>here</a>')}.</p>",
-                                    "Subject": "RCA for @{triggerBody()?['key']} request",
-                                    "To": "leonid.netrebskii@virtoway.com"
+                                    "Body": "<p>A platform team finished a @{triggerBody()?['fields']?['issuetype']?['name']} <a href=@{triggerBody()?['self']}>@{triggerBody()?['key']}:@{triggerBody()?['fields']?['summary']}</a>.<br>\n<br>\nPlease submit 2 questions survey to make our service better <a href=\"https://docs.google.com/forms/d/e/1FAIpQLSeJvhlLGumV2quxtsP9rc5WJM2rFh-qsB_ZvPAFaQ67nwlauw/viewform?entry.333850691=@{triggerBody()?['self']}\">here</a>.</p>",
+                                    "Cc": "leonid.netrebskii@virtoway.com",
+                                    "Subject": "Need for your feedback for @{triggerBody()?['key']}",
+                                    "To": "@triggerBody()?['fields']?['reporter']?['emailAddress']"
                                 },
                                 "host": {
                                     "connection": {
