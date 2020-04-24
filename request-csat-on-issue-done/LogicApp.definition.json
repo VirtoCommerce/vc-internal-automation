@@ -97,7 +97,7 @@
                                 "method": "get",
                                 "path": "/new_issue_jql_trigger/search",
                                 "queries": {
-                                    "jql": "project = \"VP\" and (Labels in (AK19, AlphaBravo)  OR issuetype=Story and reporter=5cc15cbd788c400fcdcec202) AND reporter not in (5cee9b2fad53410f201a2adf, 5cda71911b6dba0dc52c0155, 5cee9be899c4f60fa5fb9c58, 5cee9b9db457f80f23adb3bf) and status changed to \"Done\" after startOfWeek() and not status changed  to \"Done\" before startOfWeek() ORDER BY priority DESC"
+                                    "jql": "project = \"VP\" and (Labels in (AK19, AlphaBravo)  OR issuetype=Story and reporter=5cc15cbd788c400fcdcec202) AND reporter not in (5cee9b2fad53410f201a2adf, 5cda71911b6dba0dc52c0155, 5cee9be899c4f60fa5fb9c58, 5cee9b9db457f80f23adb3bf, 5d889259090bd70dc49a68a3) and status changed to \"Done\" after startOfWeek() and not status changed  to \"Done\" before startOfWeek() ORDER BY priority DESC"
                                 }
                             }
                         }
