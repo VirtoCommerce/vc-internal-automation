@@ -9,4 +9,5 @@ We decided to use LogicApp for building workflows. The workflows sources, artifa
 * [Export new issues from GitHub to Jira](/export-issues-from-github/README.md)
 * [Request RCA on jira issue rejection by QA](/request-rca-on-qa-rejection/README.md)
 * [Request CSAT survey on issue done](/request-csat-on-issue-done/README.md)
+* [Fill in Operational Funnel in Jira](/move-issues-to-funnel-state/README.md)
 * [Platform V3 Tools](/platform-v3-tools/README.md)

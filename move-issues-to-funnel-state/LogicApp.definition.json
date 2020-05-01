@@ -1,0 +1,294 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "metadata": {
+              "description": "Name of the Logic App."
+            }
+          },
+          "logicAppLocation": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "allowedValues": [
+              "[resourceGroup().location]",
+              "eastasia",
+              "southeastasia",
+              "centralus",
+              "eastus",
+              "eastus2",
+              "westus",
+              "northcentralus",
+              "southcentralus",
+              "northeurope",
+              "westeurope",
+              "japanwest",
+              "japaneast",
+              "brazilsouth",
+              "australiaeast",
+              "australiasoutheast",
+              "southindia",
+              "centralindia",
+              "westindia",
+              "canadacentral",
+              "canadaeast",
+              "uksouth",
+              "ukwest",
+              "westcentralus",
+              "westus2",
+              "koreacentral",
+              "koreasouth",
+              "francecentral",
+              "francesouth",
+              "southafricanorth",
+              "southafricawest"
+            ],
+            "metadata": {
+              "description": "Location of the Logic App."
+            }
+          },
+          "jira_instance": {
+            "type": "string",
+            "metadata": {
+              "description": "The url where your JIRA instance is hosted (must support https). "
+            }
+          },
+          "jira_username": {
+            "type": "string",
+            "metadata": {
+              "description": "Your JIRA username."
+            }
+          },
+          "jira_password": {
+            "type": "securestring",
+            "metadata": {
+              "description": "Your API token (https://id.atlassian.com/manage/api-tokens)."
+            }
+          },
+          "funnel_limit": {
+              "type": "int",
+              "defaultValue": 4,
+              "metadata": {
+                  "description": "The number of issues in 'Funnel' status. If the current number less than this value, 'To Do' issues will be moved to 'Funnel'"
+              }
+          },
+          "funnel_transition_id": {
+              "type": "int",
+              "defaultValue": 21,
+              "metadata": {
+                  "description": "Jira transition id"
+              }
+          }
+    },
+    "variables": {
+        "backlog_jql": "project = VP AND labels in (Support, Operations, v3, PlatformV3) AND issuetype in (Bug, Task, Story) AND Labels not in (QA, DevOps) ORDER BY priority"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-07-01",
+            "dependsOn": [],
+            "location": "[parameters('logicAppLocation')]",
+            "name": "[parameters('logicAppName')]",
+            "properties": {
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "jira_instance": {
+                            "type": "string"
+                        },
+                        "authorization_header": {
+                            "type": "securestring"
+                        },
+                        "funnel_jql": {
+                            "type": "string"
+                        },
+                        "todo_jql": {
+                            "type": "string"
+                        },
+                        "funnel_limit": {
+                            "type": "int"
+                        },
+                        "funnel_transition_id": {
+                            "type": "int"
+                        }
+                    },
+                    "triggers": {
+                        "Recurrence": {
+                            "recurrence": {
+                                "frequency": "Minute",
+                                "interval": 10
+                            },
+                            "type": "Recurrence"
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "For_each": {
+                                    "foreach": "@body('ISSUESTODO')['issues']",
+                                    "actions": {
+                                        "Transit_issue_to_Funnel": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                                "body": {
+                                                    "transition": {
+                                                        "id": "@{variables('FunnelTransitionId')}"
+                                                    }
+                                                },
+                                                "headers": {
+                                                    "Authorization": "@{parameters('authorization_header')}"
+                                                },
+                                                "method": "POST",
+                                                "uri": "@{item().self}/transitions?expand=transitions.fields"
+                                            },
+                                            "runtimeConfiguration": {
+                                                "secureData": {
+                                                    "properties": [
+                                                        "inputs"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "ISSUESTODO": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                },
+                                "ISSUESTODO": {
+                                    "runAfter": {},
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": {
+                                            "jql": "@parameters('todo_jql')",
+                                            "maxResults": "@sub(4, variables('NumberOfInFunnelIssues'))"
+                                        },
+                                        "headers": {
+                                            "Authorization": "@{parameters('authorization_header')}"
+                                        },
+                                        "method": "POST",
+                                        "uri": "@{parameters('jira_instance')}/rest/api/2/search"
+                                    },
+                                    "runtimeConfiguration": {
+                                        "secureData": {
+                                            "properties": [
+                                                "inputs"
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Set_Funnel_TransitionId": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "less": [
+                                            "@variables('NumberOfInFunnelIssues')",
+                                            "@parameters('funnel_limit')"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "HTTP": {
+                            "runAfter": {},
+                            "type": "Http",
+                            "inputs": {
+                                "body": {
+                                    "fields": [
+                                        "summary"
+                                    ],
+                                    "jql": "@parameters('funnel_jql')"
+                                },
+                                "headers": {
+                                    "Authorization": "@{parameters('authorization_header')}",
+                                    "Content-Type": "application/json;charset=UTF-8"
+                                },
+                                "method": "POST",
+                                "uri": "@{parameters('jira_instance')}/rest/api/2/search"
+                            },
+                            "runtimeConfiguration": {
+                                "secureData": {
+                                    "properties": [
+                                        "inputs"
+                                    ]
+                                }
+                            }
+                        },
+                        "Set_Funnel_TransitionId": {
+                            "runAfter": {
+                                "Set_Number_of_Issues_Variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "FunnelTransitionId",
+                                        "type": "integer",
+                                        "value": "@parameters('funnel_transition_id')"
+                                    }
+                                ]
+                            }
+                        },
+                        "Set_Number_of_Issues_Variable": {
+                            "runAfter": {
+                                "HTTP": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "NumberOfInFunnelIssues",
+                                        "type": "integer",
+                                        "value": "@body('HTTP')['total']"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "jira_instance": {
+                        "value": "[parameters('jira_instance')]"
+                    },
+                    "authorization_header": {
+                        "value": "[concat('Basic ', base64(concat(parameters('jira_username'), ':', parameters('jira_password'))))]"
+                    },
+                    "funnel_jql": {
+                        "value": "[concat('status = \"Funnel\" AND ', variables('backlog_jql'))]"
+                    },
+                    "todo_jql": {
+                        "value": "[concat('status = \"To Do\" AND ', variables('backlog_jql'))]"
+                    },
+                    "funnel_limit": {
+                        "value": "[parameters('funnel_limit')]"
+                    },
+                    "funnel_transition_id": {
+                        "value": "[parameters('funnel_transition_id')]"
+                    }
+                },
+                "state": "Enabled"
+            },
+            "scale": null,
+            "tags": {},
+            "type": "Microsoft.Logic/workflows"
+        }
+    ]
+}
