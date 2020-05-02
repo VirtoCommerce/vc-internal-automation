@@ -168,7 +168,7 @@
                                     "inputs": {
                                         "body": {
                                             "jql": "@parameters('todo_jql')",
-                                            "maxResults": "@sub(4, variables('NumberOfInFunnelIssues'))"
+                                            "maxResults": "@sub(parameters('funnel_limit'), variables('NumberOfInFunnelIssues'))"
                                         },
                                         "headers": {
                                             "Authorization": "@{parameters('authorization_header')}"
@@ -238,7 +238,7 @@
                                 "variables": [
                                     {
                                         "name": "FunnelTransitionId",
-                                        "type": "integer",
+                                        "type": "Integer",
                                         "value": "@parameters('funnel_transition_id')"
                                     }
                                 ]
@@ -255,7 +255,7 @@
                                 "variables": [
                                     {
                                         "name": "NumberOfInFunnelIssues",
-                                        "type": "integer",
+                                        "type": "Integer",
                                         "value": "@body('HTTP')['total']"
                                     }
                                 ]
