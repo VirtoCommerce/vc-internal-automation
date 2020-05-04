@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "value": "sync-jira-github-issues"
+        },
+        "connections": {
+            "value": {
+                "jira": "jira"
+            }
+        },
+        "jira_instance": {
+            "value": "https://virtocommerce.atlassian.net"
+        },
+        "github_api_instance": {
+            "value": "https://api.github.com"
+        }
+    }
+}
