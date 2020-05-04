@@ -69,12 +69,12 @@
                                 "jira": {
                                     "connectionId": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'jira')]",
                                     "connectionName": "jira",
-                                    "id": "[resourceId('Microsoft.Web/connections', parameters('connections')['office365'])]"
+                                    "id": "[resourceId('Microsoft.Web/connections', parameters('connections')['jira'])]"
                                 },
                                 "office365": {
                                     "connectionId": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'office365')]",
                                     "connectionName": "office365",
-                                    "id": "[resourceId('Microsoft.Web/connections', parameters('connections')['jira'])]"
+                                    "id": "[resourceId('Microsoft.Web/connections', parameters('connections')['office365'])]"
                                 }
                             },
                             "type": "Object"
@@ -155,7 +155,7 @@
                             "connectionName": "[parameters('connections')['jira']]"
                           }
                         }
-                      }
+                    }
                 },
                 "state": "Enabled"
             },
