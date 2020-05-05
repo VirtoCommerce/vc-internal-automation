@@ -75,6 +75,18 @@
                 "description": "GitHub API URI."
             }
         },
+        "github_username": {
+          "type": "string",
+          "metadata": {
+            "description": "Your JIRA username."
+          }
+        },
+        "github_password": {
+          "type": "securestring",
+          "metadata": {
+            "description": "Your API token (https://github.com/settings/tokens)."
+          }
+        },
         "connections": {
             "type": "object"
         }
@@ -108,7 +120,10 @@
                         "jira_instance": {
                             "type": "string"
                         },
-                        "authorization_header": {
+                        "jira_authorization_header": {
+                            "type": "securestring"
+                        },
+                        "github_authorization_header": {
                             "type": "securestring"
                         },
                         "backlog_jql": {
@@ -140,6 +155,24 @@
                         "For_each_GitHub_Issue": {
                             "foreach": "@variables('GitHubIssuesVar')",
                             "actions": {
+                                "Add_comment_that_issue_created": {
+                                    "runAfter": {
+                                        "Create_a_new_issue": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": {
+                                            "body": "Task @{parameters('jira_instance')}/browse/@{body('Create_a_new_issue')?['key']} has been created"
+                                        },
+                                        "headers": {
+                                            "Authorization": "@{parameters('github_authorization_header')}"
+                                        },
+                                        "method": "POST",
+                                        "uri": "@{items('For_each').url}/comments"
+                                    }
+                                },
                                 "Create_a_new_issue": {
                                     "runAfter": {},
                                     "type": "ApiConnection",
@@ -245,7 +278,7 @@
                                             "jql": "@{concat(parameters('backlog_jql'), ' AND (description ~ ', body('Join_GitHub_URIs'), ')')}"
                                         },
                                         "headers": {
-                                            "Authorization": "@{parameters('authorization_header')}",
+                                            "Authorization": "@{parameters('jira_authorization_header')}",
                                             "Content-Type": "application/json;charset=UTF-8"
                                         },
                                         "method": "POST",
@@ -332,8 +365,11 @@
                     "jira_instance": {
                         "value": "[parameters('jira_instance')]"
                     },
-                    "authorization_header": {
+                    "jira_authorization_header": {
                         "value": "[concat('Basic ', base64(concat(parameters('jira_username'), ':', parameters('jira_password'))))]"
+                    },
+                    "github_authorization_header": {
+                        "value": "[concat('Basic ', base64(concat(parameters('github_username'), ':', parameters('github_password'))))]"
                     },
                     "backlog_jql": {
                         "value": "[variables('backlog_jql')]"
