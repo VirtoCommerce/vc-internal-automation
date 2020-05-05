@@ -170,7 +170,7 @@
                                             "Authorization": "@{parameters('github_authorization_header')}"
                                         },
                                         "method": "POST",
-                                        "uri": "@{items('For_each').url}/comments"
+                                        "uri": "@{item().url}/comments"
                                     }
                                 },
                                 "Create_a_new_issue": {
