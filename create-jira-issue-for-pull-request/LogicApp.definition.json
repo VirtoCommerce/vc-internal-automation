@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_create_jira_issue_for_pull_request_name": {
+            "defaultValue": "create-jira-issue-for-pull-request",
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-07-01",
+            "dependsOn": [],
+            "location": "eastus",
+            "name": "[parameters('workflows_create_jira_issue_for_pull_request_name')]",
+            "properties": {
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "triggers": {
+                        "Recurrence": {
+                            "recurrence": {
+                                "frequency": "Minute",
+                                "interval": 10
+                            },
+                            "type": "Recurrence"
+                        }
+                    },
+                    "actions": {
+                        "Execute_JavaScript_Code": {
+                            "runAfter": {
+                                "HTTP": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "JavaScriptCode",
+                            "inputs": {
+                                "code": "var reg = /VP-\\d+/\r\n\r\nvar items = workflowContext.actions.HTTP.outputs.body.items;\r\n\r\nreturn items.filter(x => !reg.test(x.title) && x.user.type != 'Bot');"
+                            }
+                        },
+                        "HTTP": {
+                            "runAfter": {},
+                            "type": "Http",
+                            "inputs": {
+                                "method": "GET",
+                                "uri": "https://api.github.com/search/issues?q=org%3AVirtoCommerce+is%3Apr+is%3Aopen+created%3A%3E%3D@{addDays(utcNow(), -10, 'yyyy-MM-dd')}"
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {},
+                "state": "Enabled"
+            },
+            "scale": null,
+            "tags": {},
+            "type": "Microsoft.Logic/workflows"
+        }
+    ],
+    "variables": {}
+}
