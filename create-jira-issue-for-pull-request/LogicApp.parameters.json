@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "logicAppName": {
-            "value": "sync-jira-github-issues"
+            "value": "create-jira-issue-for-pull-request"
         },
         "connections": {
             "value": {
