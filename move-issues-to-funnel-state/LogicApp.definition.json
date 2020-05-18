@@ -70,7 +70,7 @@
           },
           "funnel_limit": {
               "type": "int",
-              "defaultValue": 4,
+              "defaultValue": 2,
               "metadata": {
                   "description": "The number of issues in 'Funnel' status. If the current number less than this value, 'To Do' issues will be moved to 'Funnel'"
               }
@@ -84,7 +84,7 @@
           }
     },
     "variables": {
-        "backlog_jql": "project = VP AND labels in (Support, Operations, v3, PlatformV3) AND issuetype in (Bug, Task, Story) AND Labels not in (QA, DevOps) OR labels in (Operations) AND issuetype = Review ORDER BY priority"
+        "backlog_jql": "(project = VP AND labels in (Support, Operations, v3, PlatformV3) AND issuetype in (Bug, Task, Story) AND Labels not in (QA, DevOps) OR labels in (Operations) AND issuetype = Review) ORDER BY priority"
     },
     "resources": [
         {
