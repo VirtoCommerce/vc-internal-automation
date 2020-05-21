@@ -1,6 +1,6 @@
 param(
     [String]$RootPath,
-    $NewVersion
+    $NewVersion = '3.1.0'
 )
 
 Import-Module PackageManagement
@@ -77,6 +77,7 @@ function Get-ModulesHavingBranch {
         "vc-module-Authorize.Net",
         "vc-module-avatax",
         "vc-module-azure-search",
+        "vc-module-bulk-actions",
         "vc-module-cart",
         "vc-module-catalog",
         "vc-module-catalog-csv-import",
@@ -94,6 +95,7 @@ function Get-ModulesHavingBranch {
         "vc-module-marketing",
         "vc-module-notification",
         "vc-module-order",
+        "vc-module-pagebuilder",
         "vc-module-payment",
         "vc-module-pricing",
         "vc-module-search",
@@ -165,18 +167,26 @@ function Set-ModuleVersion {
     $buildPropsPath = Join-Path $Path 'Directory.Build.Props'
     [Xml]$buildPropsXml = Get-Content -Path $buildPropsPath
 
-    $versionSuffixNode = $buildPropsXml.SelectNodes('Project/PropertyGroup/VersionSuffix').Where({ $_.Attributes.Count -eq 0 }) |
+    $versionPrefixNode = $buildPropsXml.SelectNodes('Project/PropertyGroup/VersionPrefix') |
                          Select-Object -First 1
     
-    $versionSuffixNode.InnerText = $Version
+    $versionPrefixNode.InnerText = $Version
     $buildPropsXml.Save($buildPropsPath)
 
     # Update module.manifest
     Get-ChildItem -Path $Path -Filter $manifestFilename -Recurse | ForEach-Object {
         [Xml]$xml = Get-Content -Path $_.FullName;
         
-        $node = $xml.SelectSingleNode('module/version-tag')
+        $node = $xml.SelectSingleNode('module/version')
         $node.InnerText = $Version
+
+        $node = $xml.SelectSingleNode('module/platformVersion')
+        $node.InnerText = $Version
+
+        $nodes = $xml.SelectNodes('module/dependencies/dependency')
+        $nodes | ForEach-Object {
+            $_.version = $Version
+        }
         
         $xml.Save($_.FullName)
     }
@@ -205,7 +215,7 @@ function Update-ModuleDependencies {
                             $dependencies.Add($name) | Out-Null
                         }
                         
-                        $_.Version = "3.0.0-$($Version)"
+                        $_.Version = $Version
                     }
                 }
         
@@ -214,7 +224,7 @@ function Update-ModuleDependencies {
 
     Write-Host "Ensure all dependencies of $($Path) are indexed in NuGet..."
     $dependencies | ForEach-Object {
-        Wait-PackageIndexed $_ -Version "3.0.0-$($Version)"
+        Wait-PackageIndexed $_ -Version $Version
     }
 }
 
@@ -238,7 +248,7 @@ function Invoke-CommitVersionChange {
     Set-Location $Path
 
     git pull
-    git commit -am "3.0.0-$($Version)"
+    git commit -am $Version
     git push
     
 }
