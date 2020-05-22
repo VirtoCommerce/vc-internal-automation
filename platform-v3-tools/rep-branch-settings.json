@@ -1,0 +1,24 @@
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "continuous-integration/jenkins/pr-merge",
+      "continuous-integration/jenkins/branch",
+      "license/cla"
+    ],
+    "contexts_url": "https://api.github.com/repos/ORGANIZATION_NAME_PLACEHOLDER/REPOSITORY_NAME_PLACEHOLDER/branches/BRANCH_NAME_PLACEHOLDER/protection/required_status_checks/contexts"
+  },
+  "restrictions": {
+    "users": [],
+    "teams": [],
+    "apps": []
+  },
+  "required_pull_request_reviews": {
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false
+  },
+  "enforce_admins": false,
+  "required_linear_history": false,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
