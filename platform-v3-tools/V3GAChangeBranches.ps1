@@ -1,6 +1,6 @@
 param(
     [String]$WorkingPath,
-    [String]$Organization = "leonidnorg"
+    [String]$Organization
 )
 
 $V3Branch = "dev-3.0.0"
@@ -52,6 +52,8 @@ $repositories | ForEach-Object {
 
     $repositoryPath = Join-Path $WorkingPath $_
 
+    New-Item -ItemType Directory -Force -Path $WorkingPath
+
     if (-Not (Test-Path $repositoryPath)) {
         Set-Location $WorkingPath
         git clone "https://github.com/$($Organization)/$($_)"
@@ -60,8 +62,7 @@ $repositories | ForEach-Object {
     Set-Location $repositoryPath
     git checkout $V3Branch
     git pull
-    git push --force -origin "$($V3Branch):$($GABranch)"
-    git pull
+    git push --force origin "$($V3Branch):$($GABranch)"
 
     processedRepositories.Add($_) | Out-Null
 }
