@@ -1,10 +1,9 @@
 param(
     [String]$WorkingPath,
-    [String]$Organization
+    [String]$Organization,
+    [String]$SourceBranch,
+    [String]$TargetBranch
 )
-
-$V3Branch = "dev-3.0.0"
-$GABranch = "dev"
 
 $repositories =
     "vc-platform",
@@ -22,7 +21,6 @@ $repositories =
     "vc-module-core",
     "vc-module-customer",
     "vc-module-customer-review",
-    "vc-module-datatrans",
     "vc-module-elastic-search",
     "vc-module-export",
     "vc-module-image-tools",
@@ -42,9 +40,7 @@ $repositories =
     "vc-module-subscription",
     "vc-module-tax"
 
-New-Item -ItemType Directory -Force -Path $GABranch | Out-Null
-
-$processedRepositories = [System.Collections.ArrayList]@()
+New-Item -ItemType Directory -Force -Path $TargetBranch | Out-Null
 
 $repositories | ForEach-Object {
 
@@ -60,12 +56,8 @@ $repositories | ForEach-Object {
     }
 
     Set-Location $repositoryPath
-    git checkout $V3Branch
+    git checkout $SourceBranch
     git pull
-    git push --force origin "$($V3Branch):$($GABranch)"
+    git push --force origin "$($SourceBranch):$($TargetBranch)"
 
-    processedRepositories.Add($_) | Out-Null
 }
-
-Write-Host "Updated repositories:"
-Write-Host $processedRepositories
