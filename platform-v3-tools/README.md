@@ -8,3 +8,4 @@ Tools automating Platform V3 releases delivery
 * Merge2Sandals.ps1 - takes parameter -SandalsPath with a local path to store repositories (without commas)
 * V3GAChangeBranches.ps1 - force push dev-3.0.0 to dev and release/3.0.0 to master for all platform repositories. Takes parameter -WorkingBranch with a local path to store repositories (without commas)
 * UpdateBranchSettings.ps1 - updates branch settings for all repositories. Settings template is defined in the rep-branch-settinigs.json file.
+* V3GAChangeBranches.ps1 - the script which has been used to replace dev with dev-3.0.0 and master with release/3.0.0 in all V3 repositories.
