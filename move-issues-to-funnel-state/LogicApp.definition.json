@@ -84,7 +84,7 @@
           }
     },
     "variables": {
-        "backlog_jql": "(project = VP AND issuetype in (Bug) OR labels in (Operations) AND issuetype = Review) ORDER BY priority"
+        "backlog_jql": "(project = VP AND issuetype in (Bug)) ORDER BY priority"
     },
     "resources": [
         {
