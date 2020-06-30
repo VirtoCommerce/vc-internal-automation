@@ -1,289 +1,313 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "logicAppName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80,
-            "metadata": {
-              "description": "Name of the Logic App."
-            }
-        },
-        "logicAppLocation": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "allowedValues": [
-                "[resourceGroup().location]",
-                "eastasia",
-                "southeastasia",
-                "centralus",
-                "eastus",
-                "eastus2",
-                "westus",
-                "northcentralus",
-                "southcentralus",
-                "northeurope",
-                "westeurope",
-                "japanwest",
-                "japaneast",
-                "brazilsouth",
-                "australiaeast",
-                "australiasoutheast",
-                "southindia",
-                "centralindia",
-                "westindia",
-                "canadacentral",
-                "canadaeast",
-                "uksouth",
-                "ukwest",
-                "westcentralus",
-                "westus2",
-                "koreacentral",
-                "koreasouth",
-                "francecentral",
-                "francesouth",
-                "southafricanorth",
-                "southafricawest"
-            ],
-            "metadata": {
-                "description": "Location of the Logic App."
-            }
-        },
-        "jira_instance": {
-            "type": "string",
-            "metadata": {
-                "description": "The url where your JIRA instance is hosted (must support https). "
-            }
-        },
-        "jira_username": {
-            "type": "string",
-            "metadata": {
-                "description": "Your JIRA username."
-            }
-        },
-        "jira_password": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Your API token (https://id.atlassian.com/manage/api-tokens)."
-            }
-        },
-        "github_api_instance": {
-            "type": "string",
-            "defaultValue": "https://api.github.com",
-            "metadata": {
-                "description": "GitHub API URI."
-            }
-        },
-        "github_username": {
-          "type": "string",
-          "metadata": {
-            "description": "Your JIRA username."
-          }
-        },
-        "github_password": {
-          "type": "securestring",
-          "metadata": {
-            "description": "Your API token (https://github.com/settings/tokens)."
-          }
-        },
-        "connections": {
-            "type": "object"
-        },
-        "integrationAccounts_logicapp_inline_code_externalid": {
-            "defaultValue": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/integrationAccounts/logicapp-inline-code')]",
-            "type": "string"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
     },
-    "variables": {
-        "github_query_uri": "org%3AVirtoCommerce+is%3Apr+is%3Aopen+-label%3A\"review+task+created\"+created%3A%3E%3D2020-05-01",
-        "github_label": "review task created",
-        "jira_issuetype": "10051",
-        "jira_project": "VP"
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "[resourceGroup().location]",
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "southindia",
+        "centralindia",
+        "westindia",
+        "canadacentral",
+        "canadaeast",
+        "uksouth",
+        "ukwest",
+        "westcentralus",
+        "westus2",
+        "koreacentral",
+        "koreasouth",
+        "francecentral",
+        "francesouth",
+        "uaecentral",
+        "southafricanorth",
+        "southafricawest"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
     },
-    "resources": [
-        {
-            "apiVersion": "2017-07-01",
-            "dependsOn": [],
-            "location": "[parameters('logicAppLocation')]",
-            "name": "[parameters('logicAppName')]",
-            "properties": {
-                "definition": {
-                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "$connections": {
-                            "defaultValue": {
-                                "jira": {
-                                    "connectionId": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'jira')]",
-                                    "connectionName": "jira",
-                                    "id": "[resourceId('Microsoft.Web/connections', parameters('connections')['jira'])]"
-                                }
-                            },
-                            "type": "object"
-                        },
-                        "jira_instance": {
-                            "type": "string"
-                        },
-                        "github_authorization_header": {
-                            "type": "securestring"
-                        },
-                        "jira_issuetype": {
-                            "type": "string"
-                        },
-                        "jira_project": {
-                            "type": "string"
-                        },
-                        "github_api_instance": {
-                            "type": "string"
-                        },
-                        "github_query_uri": {
-                            "type": "string"
-                        }
-                    },
-                    "triggers": {
-                        "Recurrence": {
-                            "recurrence": {
-                                "frequency": "Minute",
-                                "interval": 10
-                            },
-                            "type": "Recurrence"
-                        }
-                    },
-                    "actions": {
-                        "Filter_up_not_syncronized_only": {
-                            "runAfter": {
-                                "HTTP": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "JavaScriptCode",
-                            "inputs": {
-                                "code": "var reviewTaskCreatedLabel = 'review task created';\r\n\r\nvar reg = /VP-\\d+/\r\n\r\nvar items = workflowContext.actions.HTTP.outputs.body.items;\r\n\r\nvar filtered = items.filter(x => !reg.test(x.title) && x.user.type != 'Bot' && x.repository_url.startsWith('https://api.github.com/repos/VirtoCommerce/vc'));\r\n\r\nvar transformed = filtered.map(x => {\r\n    var labels = x.labels.map(l => l.name);\r\n    labels.push(reviewTaskCreatedLabel);\r\n\r\n    return {\r\n        url: x.url,\r\n        html_url: x.html_url,\r\n        title: x.title,\r\n        labels: labels\r\n    }\r\n});\r\n\r\nreturn transformed;"
-                            }
-                        },
-                        "For_each": {
-                            "foreach": "@body('Filter_up_not_syncronized_only')",
-                            "actions": {
-                                "Add_comment_that_issue_created": {
-                                    "runAfter": {
-                                        "Add_label_that_issue_created": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "body": {
-                                            "body": "Review task @{parameters('jira_instance')}/browse/@{body('Create_a_new_issue')?['key']} has been created"
-                                        },
-                                        "headers": {
-                                            "Authorization": "@{parameters('github_authorization_header')}"
-                                        },
-                                        "method": "POST",
-                                        "uri": "@{items('For_each').url}/comments"
-                                    }
-                                },
-                                "Add_label_that_issue_created": {
-                                    "runAfter": {
-                                        "Create_a_new_issue": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "body": "{\n\"labels\": @{items('For_each').labels}\n}",
-                                        "headers": {
-                                            "Authorization": "@{parameters('github_authorization_header')}"
-                                        },
-                                        "method": "PATCH",
-                                        "uri": "@{items('For_each').url}"
-                                    }
-                                },
-                                "Create_a_new_issue": {
-                                    "runAfter": {},
-                                    "type": "ApiConnection",
-                                    "inputs": {
-                                        "body": {
-                                            "fields": {
-                                                "description": "Pull Request: @{items('For_each').html_url}\nTitle: @{items('For_each').title}",
-                                                "issuetype": {
-                                                    "id": "@parameters('jira_issuetype')"
-                                                },
-                                                "labels": "Operations",
-                                                "priority": {
-                                                    "id": "1"
-                                                },
-                                                "summary": "Code Review: @{items('For_each').title}"
-                                            }
-                                        },
-                                        "host": {
-                                            "connection": {
-                                                "name": "@parameters('$connections')['jira']['connectionId']"
-                                            }
-                                        },
-                                        "method": "post",
-                                        "path": "/issue",
-                                        "queries": {
-                                            "projectKey": "@parameters('jira_project')"
-                                        }
-                                    }
-                                }
-                            },
-                            "runAfter": {
-                                "Filter_up_not_syncronized_only": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Foreach"
-                        },
-                        "HTTP": {
-                            "runAfter": {},
-                            "type": "Http",
-                            "inputs": {
-                                "method": "GET",
-                                "uri": "@{concat(parameters('github_api_instance'), '/search/issues?q=', parameters('github_query_uri'))}"
-                            }
-                        }
-                    },
-                    "outputs": {}
-                },
-                "parameters": {
-                    "$connections": {
-                        "value": {
-                          "jira": {
-                            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'jira')]",
-                            "connectionId": "[resourceId('Microsoft.Web/connections', parameters('connections')['jira'])]",
-                            "connectionName": "[parameters('connections')['jira']]"
-                          }
-                        }
-                    },
-                    "jira_instance": {
-                        "value": "[parameters('jira_instance')]"
-                    },
-                    "github_authorization_header": {
-                        "value": "[concat('Basic ', base64(concat(parameters('github_username'), ':', parameters('github_password'))))]"
-                    },
-                    "jira_issuetype": {
-                        "value": "[variables('jira_issuetype')]"
-                    },
-                    "jira_project": {
-                        "value": "[variables('jira_project')]"
-                    },
-                    "github_api_instance": {
-                        "value": "[parameters('github_api_instance')]"
-                    },
-                    "github_query_uri": {
-                        "value": "[variables('github_query_uri')]"
-                    }
-                },
-                "integrationAccount": {
-                    "id": "[parameters('integrationAccounts_logicapp_inline_code_externalid')]"
-                },
-                "state": "Enabled"
+    "jira_instance": {
+      "type": "string",
+      "metadata": {
+        "description": "The url where your JIRA instance is hosted (must support https). "
+      }
+    },
+    "jira_username": {
+      "type": "string",
+      "metadata": {
+        "description": "Your JIRA username."
+      }
+    },
+    "jira_password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Your API token (https://id.atlassian.com/manage/api-tokens)."
+      }
+    },
+    "github_api_instance": {
+      "type": "string",
+      "defaultValue": "https://api.github.com",
+      "metadata": {
+        "description": "GitHub API URI."
+      }
+    },
+    "github_username": {
+      "type": "string",
+      "metadata": {
+        "description": "Your JIRA username."
+      }
+    },
+    "github_password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Your API token (https://github.com/settings/tokens)."
+      }
+    },
+    "connections": {
+      "type": "object"
+    },
+    "integrationAccounts_logicapp_inline_code_externalid": {
+      "defaultValue": "[concat(subscription().id, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/integrationAccounts/logicapp-inline-code')]",
+      "type": "string"
+    },
+    "jira_Connection_Name": {
+      "type": "string",
+      "defaultValue": "jira"
+    },
+    "jira_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "vc-internal-automation"
+    }
+  },
+  "variables": {
+    "github_query_uri": "org%3AVirtoCommerce+is%3Apr+is%3Aopen+-label%3A\"review+task+created\"+created%3A%3E%3D2020-05-01",
+    "github_label": "review task created",
+    "jira_issuetype": "10051",
+    "jira_project": "VP"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-07-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', parameters('jira_Connection_Name'))]"
+      ],
+      "location": "[parameters('logicAppLocation')]",
+      "name": "[parameters('logicAppName')]",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "Filter_up_not_syncronized_only": {
+              "type": "JavaScriptCode",
+              "inputs": {
+                "code": "var reviewTaskCreatedLabel = 'review task created';\r\n\r\nvar reg = /VP-\\d+/\r\n\r\nvar items = workflowContext.actions.HTTP.outputs.body.items;\r\n\r\nvar filtered = items.filter(x => !reg.test(x.title) && x.user.type != 'Bot' && x.repository_url.startsWith('https://api.github.com/repos/VirtoCommerce/vc'));\r\n\r\nvar transformed = filtered.map(x => {\r\n    var labels = x.labels.map(l => l.name);\r\n    labels.push(reviewTaskCreatedLabel);\r\n\r\n    return {\r\n        url: x.url,\r\n        html_url: x.html_url,\r\n        title: x.title,\r\n        labels: labels\r\n    }\r\n});\r\n\r\nreturn transformed;"
+              },
+              "runAfter": {
+                "HTTP": [
+                  "Succeeded"
+                ]
+              }
             },
-            "scale": null,
-            "tags": {},
-            "type": "Microsoft.Logic/workflows"
+            "For_each": {
+              "type": "Foreach",
+              "foreach": "@body('Filter_up_not_syncronized_only')",
+              "actions": {
+                "Add_comment_that_issue_created": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "POST",
+                    "uri": "@{items('For_each').url}/comments",
+                    "headers": {
+                      "Authorization": "@{parameters('github_authorization_header')}"
+                    },
+                    "body": {
+                      "body": "Review task @{parameters('jira_instance')}/browse/@{body('Create_a_new_issue')?['key']} has been created"
+                    }
+                  },
+                  "runAfter": {
+                    "Add_label_that_issue_created": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Add_label_that_issue_created": {
+                  "type": "Http",
+                  "inputs": {
+                    "method": "PATCH",
+                    "uri": "@{items('For_each').url}",
+                    "headers": {
+                      "Authorization": "@{parameters('github_authorization_header')}"
+                    },
+                    "body": "{\n\"labels\": @{items('For_each').labels}\n}"
+                  },
+                  "runAfter": {
+                    "Create_a_new_issue": [
+                      "Succeeded"
+                    ]
+                  }
+                },
+                "Create_a_new_issue": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['jira_1']['connectionId']"
+                      }
+                    },
+                    "method": "post",
+                    "body": {
+                      "fields": {
+                        "issuetype": {
+                          "id": "@parameters('jira_issuetype')"
+                        },
+                        "summary": "Code Review: @{items('For_each').title}",
+                        "description": "Pull Request: @{items('For_each').html_url}\nTitle: @{items('For_each').title}",
+                        "priority": {
+                          "id": "1"
+                        },
+                        "labels": "Operations"
+                      }
+                    },
+                    "path": "/issue",
+                    "queries": {
+                      "projectKey": "@parameters('jira_project')"
+                    }
+                  },
+                  "runAfter": {}
+                }
+              },
+              "runAfter": {
+                "Filter_up_not_syncronized_only": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "HTTP": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "@{concat(parameters('github_api_instance'), '/search/issues?q=', parameters('github_query_uri'))}"
+              },
+              "runAfter": {}
+            }
+          },
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            },
+            "jira_instance": {
+              "type": "string"
+            },
+            "github_authorization_header": {
+              "type": "securestring"
+            },
+            "jira_issuetype": {
+              "type": "string"
+            },
+            "jira_project": {
+              "type": "string"
+            },
+            "github_api_instance": {
+              "type": "string"
+            },
+            "github_query_uri": {
+              "type": "string"
+            }
+          },
+          "triggers": {
+            "Recurrence": {
+              "type": "Recurrence",
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 10
+              }
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "jira_1": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'jira')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('jira_Connection_Name'))]",
+                "connectionName": "[parameters('jira_Connection_Name')]"
+              }
+            }
+          },
+          "jira_instance": {
+            "value": "[parameters('jira_instance')]"
+          },
+          "github_authorization_header": {
+            "value": "[concat('Basic ', base64(concat(parameters('github_username'), ':', parameters('github_password'))))]"
+          },
+          "jira_issuetype": {
+            "value": "[variables('jira_issuetype')]"
+          },
+          "jira_project": {
+            "value": "[variables('jira_project')]"
+          },
+          "github_api_instance": {
+            "value": "[parameters('github_api_instance')]"
+          },
+          "github_query_uri": {
+            "value": "[variables('github_query_uri')]"
+          }
+        },
+        "integrationAccount": {
+          "id": "[parameters('integrationAccounts_logicapp_inline_code_externalid')]"
+        },
+        "state": "Enabled"
+      },
+      "scale": null,
+      "tags": {
+        "displayName": "LogicApp"
+      },
+      "type": "Microsoft.Logic/workflows"
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('jira_Connection_Name')]",
+      "location": "[parameters('logicAppLocation')]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', parameters('logicAppLocation'), '/managedApis/', 'jira')]"
+        },
+        "displayName": "[parameters('jira_Connection_DisplayName')]",
+        "parameterValues": {
+          "jirainstance": "[parameters('jira_instance')]",
+          "username": "[parameters('jira_username')]",
+          "password": "[parameters('jira_password')]"
         }
-    ]
+      }
+    }
+  ]
 }

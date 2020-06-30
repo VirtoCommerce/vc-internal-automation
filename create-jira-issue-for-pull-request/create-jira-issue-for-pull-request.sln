@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "create-jira-issue-for-pull-request", "create-jira-issue-for-pull-request.deployproj", "{BEF7A802-8888-4A20-985E-60F0914BFB7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEF7A802-8888-4A20-985E-60F0914BFB7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF7A802-8888-4A20-985E-60F0914BFB7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF7A802-8888-4A20-985E-60F0914BFB7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF7A802-8888-4A20-985E-60F0914BFB7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF48F352-2819-4342-916D-D14593DCB814}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "move-issues-to-funnel-state", "move-issues-to-funnel-state.deployproj", "{1E58DBA3-82A2-4353-9DC7-6E68E2F48F79}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E58DBA3-82A2-4353-9DC7-6E68E2F48F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E58DBA3-82A2-4353-9DC7-6E68E2F48F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E58DBA3-82A2-4353-9DC7-6E68E2F48F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E58DBA3-82A2-4353-9DC7-6E68E2F48F79}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BB4F7747-3D3E-4C07-A3C1-E87FAF4A6FB8}
+	EndGlobalSection
+EndGlobal
