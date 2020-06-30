@@ -3,7 +3,7 @@ param(
     $Organization = 'VirtoCommerce'
 )
 
-$Branches = "dev", "master"
+$Branches = "dev", "master", "support/2.x", "support/2.x-dev"
 
 if (-not (Get-Module -ListAvailable -Name PowerShellForGitHub)) {
     Install-Module PowerShellForGitHub -Force
