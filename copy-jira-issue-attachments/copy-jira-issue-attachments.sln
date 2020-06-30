@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "copy-jira-issue-attachments", "copy-jira-issue-attachments.deployproj", "{2AAEF059-3F3A-4233-BA58-AB5866D1BA98}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2AAEF059-3F3A-4233-BA58-AB5866D1BA98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AAEF059-3F3A-4233-BA58-AB5866D1BA98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AAEF059-3F3A-4233-BA58-AB5866D1BA98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AAEF059-3F3A-4233-BA58-AB5866D1BA98}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {744D335E-15F3-419E-A754-05356F17DFC7}
+	EndGlobalSection
+EndGlobal

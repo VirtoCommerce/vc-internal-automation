@@ -1,275 +1,277 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "logicAppName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 80,
-            "metadata": {
-              "description": "Name of the Logic App."
-            }
-        },
-        "logicAppLocation": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "allowedValues": [
-                "[resourceGroup().location]",
-                "eastasia",
-                "southeastasia",
-                "centralus",
-                "eastus",
-                "eastus2",
-                "westus",
-                "northcentralus",
-                "southcentralus",
-                "northeurope",
-                "westeurope",
-                "japanwest",
-                "japaneast",
-                "brazilsouth",
-                "australiaeast",
-                "australiasoutheast",
-                "southindia",
-                "centralindia",
-                "westindia",
-                "canadacentral",
-                "canadaeast",
-                "uksouth",
-                "ukwest",
-                "westcentralus",
-                "westus2",
-                "koreacentral",
-                "koreasouth",
-                "francecentral",
-                "francesouth",
-                "southafricanorth",
-                "southafricawest"
-            ],
-            "metadata": {
-                "description": "Location of the Logic App."
-            }
-        },
-        "jira_instance": {
-            "type": "string",
-            "metadata": {
-                "description": "The url where your JIRA instance is hosted (must support https). "
-            }
-        },
-        "jira_username": {
-            "type": "string",
-            "metadata": {
-                "description": "Your JIRA username."
-            }
-        },
-        "jira_password": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Your API token (https://id.atlassian.com/manage/api-tokens)."
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "metadata": {
+        "description": "Name of the Logic App."
+      }
     },
-    "resources": [
-        {
-            "apiVersion": "2017-07-01",
-            "dependsOn": [],
-            "location": "centralus",
-            "name": "[parameters('logicAppName')]",
-            "properties": {
-                "definition": {
-                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "jira_instance": {
-                            "type": "string"
-                        },
-                        "authorization_header": {
-                            "type": "securestring"
+    "logicAppLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "allowedValues": [
+        "[resourceGroup().location]",
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "southindia",
+        "centralindia",
+        "westindia",
+        "canadacentral",
+        "canadaeast",
+        "uksouth",
+        "ukwest",
+        "westcentralus",
+        "westus2",
+        "koreacentral",
+        "koreasouth",
+        "francecentral",
+        "francesouth",
+        "southafricanorth",
+        "southafricawest"
+      ],
+      "metadata": {
+        "description": "Location of the Logic App."
+      }
+    },
+    "jira_instance": {
+      "type": "string",
+      "metadata": {
+        "description": "The url where your JIRA instance is hosted (must support https). "
+      }
+    },
+    "jira_username": {
+      "type": "string",
+      "metadata": {
+        "description": "Your JIRA username."
+      }
+    },
+    "jira_password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Your API token (https://id.atlassian.com/manage/api-tokens)."
+      }
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-07-01",
+      "dependsOn": [],
+      "location": "[parameters('LogicAppLocation')]",
+      "name": "[parameters('logicAppName')]",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "For_each": {
+              "type": "Foreach",
+              "foreach": "@variables('Attachments')",
+              "actions": {
+                "Condition": {
+                  "type": "If",
+                  "expression": {
+                    "or": [
+                      {
+                        "equals": [
+                          "@bool(triggerBody()?['copyAll'])",
+                          "@bool(true)"
+                        ]
+                      },
+                      {
+                        "contains": [
+                          "@{body('Get_Last_Comment').comments[0].body}",
+                          "@item().filename"
+                        ]
+                      }
+                    ]
+                  },
+                  "actions": {
+                    "Download_Image": {
+                      "type": "Http",
+                      "inputs": {
+                        "method": "GET",
+                        "uri": "@{outputs('Get_Download_URL')['headers'].location}"
+                      },
+                      "runAfter": {
+                        "Get_Download_URL": [
+                          "Succeeded",
+                          "Failed"
+                        ]
+                      }
+                    },
+                    "Get_Download_URL": {
+                      "type": "Http",
+                      "inputs": {
+                        "method": "GET",
+                        "uri": "@{items('For_each')['content']}",
+                        "headers": {
+                          "Authorization": "@{parameters('authorization_header')}"
                         }
+                      },
+                      "runAfter": {}
                     },
-                    "triggers": {
-                        "manual": {
-                            "type": "Request",
-                            "kind": "Http",
-                            "inputs": {
-                                "method": "POST",
-                                "schema": {
-                                    "properties": {
-                                        "copyAll": {
-                                            "type": "boolean"
-                                        },
-                                        "destIssueKey": {
-                                            "type": "string"
-                                        },
-                                        "sourceIssueKey": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                    "Upload_Image_to_the_Issue": {
+                      "type": "Http",
+                      "inputs": {
+                        "method": "POST",
+                        "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['destIssueKey']}/attachments",
+                        "headers": {
+                          "Authorization": "@{parameters('authorization_header')}",
+                          "X-Atlassian-Token": "no-check"
+                        },
+                        "body": {
+                          "$content-type": "multipart/form-data",
+                          "$multipart": [
+                            {
+                              "body": {
+                                "$content": "@{body('Download_Image')['$content']}",
+                                "$content-type": "@{body('Download_Image')['$content-type']}"
+                              },
+                              "headers": {
+                                "Content-Disposition": "form-data; name=file; filename=@{item()['filename']}"
+                              }
                             }
+                          ]
                         }
-                    },
-                    "actions": {
-                        "For_each": {
-                            "foreach": "@variables('Attachments')",
-                            "actions": {
-                                "Condition": {
-                                    "actions": {
-                                        "Download_Image": {
-                                            "runAfter": {
-                                                "Get_Download_URL": [
-                                                    "Succeeded",
-                                                    "Failed"
-                                                ]
-                                            },
-                                            "type": "Http",
-                                            "inputs": {
-                                                "method": "GET",
-                                                "uri": "@{outputs('Get_Download_URL')['headers'].location}"
-                                            }
-                                        },
-                                        "Get_Download_URL": {
-                                            "runAfter": {},
-                                            "type": "Http",
-                                            "inputs": {
-                                                "headers": {
-                                                    "Authorization": "@{parameters('authorization_header')}"
-                                                },
-                                                "method": "GET",
-                                                "uri": "@{items('For_each')['content']}"
-                                            }
-                                        },
-                                        "Upload_Image_to_the_Issue": {
-                                            "runAfter": {
-                                                "Download_Image": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Http",
-                                            "inputs": {
-                                                "body": {
-                                                    "$content-type": "multipart/form-data",
-                                                    "$multipart": [
-                                                        {
-                                                            "body": {
-                                                                "$content": "@{body('Download_Image')['$content']}",
-                                                                "$content-type": "@{body('Download_Image')['$content-type']}"
-                                                            },
-                                                            "headers": {
-                                                                "Content-Disposition": "form-data; name=file; filename=@{item()['filename']}"
-                                                            }
-                                                        }
-                                                    ]
-                                                },
-                                                "headers": {
-                                                    "Authorization": "@{parameters('authorization_header')}",
-                                                    "X-Atlassian-Token": "no-check"
-                                                },
-                                                "method": "POST",
-                                                "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['destIssueKey']}/attachments"
-                                            }
-                                        }
-                                    },
-                                    "runAfter": {},
-                                    "expression": {
-                                        "or": [
-                                            {
-                                                "equals": [
-                                                    "@bool(triggerBody()?['copyAll'])",
-                                                    "@bool(true)"
-                                                ]
-                                            },
-                                            {
-                                                "contains": [
-                                                    "@{body('Get_Last_Comment').comments[0].body}",
-                                                    "@item().filename"
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "type": "If"
-                                }
-                            },
-                            "runAfter": {
-                                "Initialize_variable": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Foreach"
-                        },
-                        "Get_Issue": {
-                            "runAfter": {},
-                            "type": "Http",
-                            "inputs": {
-                                "headers": {
-                                    "Authorization": "@{parameters('authorization_header')}"
-                                },
-                                "method": "GET",
-                                "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['sourceIssueKey']}?fields=attachment"
-                            }
-                        },
-                        "Get_Last_Comment": {
-                            "runAfter": {
-                                "Get_Issue": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "headers": {
-                                    "Authorization": "@{parameters('authorization_header')}"
-                                },
-                                "method": "GET",
-                                "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['sourceIssueKey']}/comment?orderBy=-created&maxResults=0&expand=renderedBody"
-                            }
-                        },
-                        "Initialize_variable": {
-                            "runAfter": {
-                                "Get_Last_Comment": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "Attachments",
-                                        "type": "array",
-                                        "value": "@body('Get_Issue')['fields']['attachment']"
-                                    }
-                                ]
-                            }
-                        },
-                        "Response": {
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Response",
-                            "kind": "Http",
-                            "inputs": {
-                                "statusCode": 200
-                            }
-                        }
-                    },
-                    "outputs": {}
-                },
-                "parameters": {
-                    "jira_instance": {
-                        "value": "[parameters('jira_instance')]"
-                    },
-                    "authorization_header": {
-                        "value": "[concat('Basic ', base64(concat(parameters('jira_username'), ':', parameters('jira_password'))))]"
+                      },
+                      "runAfter": {
+                        "Download_Image": [
+                          "Succeeded"
+                        ]
+                      }
                     }
-                },
-                "state": "Enabled"
+                  },
+                  "runAfter": {}
+                }
+              },
+              "runAfter": {
+                "Initialize_variable": [
+                  "Succeeded"
+                ]
+              }
             },
-            "scale": null,
-            "tags": {},
-            "type": "Microsoft.Logic/workflows"
-        }
-    ],
-    "variables": {}
+            "Get_Issue": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['sourceIssueKey']}?fields=attachment",
+                "headers": {
+                  "Authorization": "@{parameters('authorization_header')}"
+                }
+              },
+              "runAfter": {}
+            },
+            "Get_Last_Comment": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "@{parameters('jira_instance')}/rest/api/2/issue/@{triggerBody()?['sourceIssueKey']}/comment?orderBy=-created&maxResults=0&expand=renderedBody",
+                "headers": {
+                  "Authorization": "@{parameters('authorization_header')}"
+                }
+              },
+              "runAfter": {
+                "Get_Issue": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Initialize_variable": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Attachments",
+                    "type": "array",
+                    "value": "@body('Get_Issue')['fields']['attachment']"
+                  }
+                ]
+              },
+              "runAfter": {
+                "Get_Last_Comment": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Response": {
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 200
+              },
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "parameters": {
+            "jira_instance": {
+              "type": "string"
+            },
+            "authorization_header": {
+              "type": "securestring"
+            }
+          },
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "copyAll": {
+                      "type": "boolean"
+                    },
+                    "destIssueKey": {
+                      "type": "string"
+                    },
+                    "sourceIssueKey": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "method": "POST"
+              }
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {
+          "jira_instance": {
+            "value": "[parameters('jira_instance')]"
+          },
+          "authorization_header": {
+            "value": "[concat('Basic ', base64(concat(parameters('jira_username'), ':', parameters('jira_password'))))]"
+          }
+        },
+        "state": "Enabled"
+      },
+      "scale": null,
+      "tags": {
+        "displayName": "LogicApp"
+      },
+      "type": "Microsoft.Logic/workflows"
+    }
+  ],
+  "variables": {}
 }
