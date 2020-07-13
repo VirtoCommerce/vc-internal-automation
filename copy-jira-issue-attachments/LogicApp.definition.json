@@ -95,8 +95,8 @@
                       },
                       {
                         "contains": [
-                          "@{body('Get_Last_Comment').comments[0].body}",
-                          "@item().filename"
+                          "@{first(body('Get_Last_Comment')?['comments'])?['body']}",
+                          "@item()?['filename']"
                         ]
                       }
                     ]
@@ -106,7 +106,7 @@
                       "type": "Http",
                       "inputs": {
                         "method": "GET",
-                        "uri": "@{outputs('Get_Download_URL')['headers'].location}"
+                        "uri": "@{outputs('Get_Download_URL')?['headers']?['location']}"
                       },
                       "runAfter": {
                         "Get_Download_URL": [
@@ -119,7 +119,7 @@
                       "type": "Http",
                       "inputs": {
                         "method": "GET",
-                        "uri": "@{items('For_each')['content']}",
+                        "uri": "@{items('For_each')?['content']}",
                         "headers": {
                           "Authorization": "@{parameters('authorization_header')}"
                         }
@@ -140,11 +140,11 @@
                           "$multipart": [
                             {
                               "body": {
-                                "$content": "@{body('Download_Image')['$content']}",
-                                "$content-type": "@{body('Download_Image')['$content-type']}"
+                                "$content": "@{body('Download_Image')?['$content']}",
+                                "$content-type": "@{body('Download_Image')?['$content-type']}"
                               },
                               "headers": {
-                                "Content-Disposition": "form-data; name=file; filename=@{item()['filename']}"
+                                "Content-Disposition": "form-data; name=file; filename=@{item()?['filename']}"
                               }
                             }
                           ]
@@ -199,7 +199,7 @@
                   {
                     "name": "Attachments",
                     "type": "array",
-                    "value": "@body('Get_Issue')['fields']['attachment']"
+                    "value": "@body('Get_Issue')?['fields']?['attachment']"
                   }
                 ]
               },
