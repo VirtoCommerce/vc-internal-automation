@@ -151,7 +151,7 @@
                         "issuetype": {
                           "id": "@parameters('jira_issuetype')"
                         },
-                        "summary": "@{item().title}",
+                        "summary": "@if(greater(length(items('For_each_GitHub_Issue')['title']),255),substring(items('For_each_GitHub_Issue')['title'], 0, 255), items('For_each_GitHub_Issue')['title'])",
                         "description": "GitHub link: [@{item().html_url}|@{item().html_url}]\n\n======= Description from GitHub =======\n@{item().body}",
                         "labels": "Github,Operations"
                       }
