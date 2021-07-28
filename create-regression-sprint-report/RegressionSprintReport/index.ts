@@ -2,6 +2,10 @@ import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import fetch from "node-fetch";
 import * as yaml from "js-yaml";
 
+const loginSeecret = "ConfluenceLogin";
+const passwordSeecret = "ConfluenceToken";
+const confluenceUrl = "ConfluenceUrl";
+
 
 interface ModuleInfo
 {
@@ -50,16 +54,33 @@ async function getModulesList(configMapUrl: string){
     return await parseModulesVersion(JSON.parse(modulesList));
 }
 
-async function createConfluencePage(confluencePageSettings: ConfluencePageInfo, ){
-}
+async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo, url: string, userName: string, password: string){
 
+     const body: string = JSON.stringify(confluencePageSettings);
+     const headers = { 
+        'Authorization': `Basic ` + Buffer.from(`${userName}:${password}`).toString('base64'),
+        'Content-Type': 'application/json',
+    }
+    try {
+        const result = await fetch(url, {
+            method: 'post',
+            body: body,
+            headers: headers
+        });
+
+        return await result.json();
+    
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 function createPageContent(modulesVersion: ModuleInfo[], currentSprint: string){
     let pageBody: string = '<table>';
     let rowN: number = 0;
     pageBody += '<tr> <th>#</th> <th>Module Name</th> <th>Module Version</th> <th>Existed integrations</th> <th>Type testing</th> <th>Issues from previous sprints</th> <th>Issues</th> </tr>'
     for(let module of modulesVersion){
-        pageBody += `<tr> <td>${rowN ++}</td> <td>${module.id}</td> <td>${module.version}</td> <td></td> <td></td> <td></td> <td></td> </tr>`
+        pageBody += `<tr> <td>${++ rowN}</td> <td>${module.id}</td> <td>${module.version}</td> <td></td> <td></td> <td></td> <td></td> </tr>`
     }
     pageBody += '</table>';
 
@@ -90,7 +111,11 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
 }
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-//    const configMapUrl = "https://raw.githubusercontent.com/VirtoCommerce/vc-deploy-apps/qa/regression-app/overlays/qa/deployment-cm.yaml";
+
+    const login = process.env[loginSeecret];
+    const password = process.env[passwordSeecret];
+    const url = process.env[confluenceUrl];
+
     context.log('HTTP trigger function processed a request.');
     const name = (req.query.name || (req.body && req.body.name));
 
@@ -105,10 +130,20 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     };
 
     const currentSprint = "7";
+
+    const pageType: string = "page"; 
+    const pageTitle: string = "new page"; 
+    const spaceKey: string = "PLREC"; 
+    const subpageId: number = 234160191; 
+    const pageRepresentation: string = "storage";
+
     const deploymentCm = configMapUrl ? await getModulesList(configMapUrl) : null;
-    const pageBody = createPageContent(deploymentCm, currentSprint)
-    console.log(deploymentCm);
-    console.log(pageBody);
+    const pageBody = createPageContent(deploymentCm, currentSprint);
+    const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
+    const res = await publishConfluencePage(pageSettings, url, login, password);
+
+//    console.log(pageSettings);
+    console.log(res);
 };
 
 export default httpTrigger;
