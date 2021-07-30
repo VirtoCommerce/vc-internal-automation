@@ -6,7 +6,8 @@ const loginSecretParam = "ConfluenceLogin";
 const passwordSecretParam = "ConfluenceToken";
 const confluenceUrlParam = "ConfluenceUrl";
 const jiraUrlParam = "jiraUrl";
-const modulePrefix = "VirtoCommerce."
+const modulePrefix = "VirtoCommerce.";
+const platformKey = "docker.pkg.github.com/virtocommerce/vc-platform/platform";
 
 
 interface ModuleInfo
@@ -44,8 +45,29 @@ function getHostName(url: string){
     return matches && matches[1];
 }
 
+
+async function getPlatformVersion(kustomizationUrl:string){
+
+    console.log("Get Platform version");
+
+    const response = await fetch(kustomizationUrl);
+    const doc = yaml.load(await response.text());
+    const imageIndex = doc["images"].findIndex( x => x.name === platformKey );
+
+    let platformVersion: ModuleInfo = {
+        id:  "Platform",
+        version: doc["images"][imageIndex]["newTag"],
+        oldIssues: null,
+        sprintIssues: null
+    }
+
+    return platformVersion;
+}
+
 function parseModulesVersion(modulesList: any[]){
+
     let modulesVersionArray: ModuleInfo[] = [];
+
     for( let module of modulesList){
         const regexVersion = /_\d+\.\d+\.\d+/;
         let packageUrl: string = module["PackageUrl"];
@@ -61,13 +83,22 @@ function parseModulesVersion(modulesList: any[]){
 }
 
 async function getModulesList(configMapUrl: string){
+
+    console.log("Get modules list");
+
     const response = await fetch(configMapUrl);
     const doc = yaml.load(await response.text());
     let modulesList = doc["data"]?.["modules.json"];
     return parseModulesVersion(JSON.parse(modulesList));
 }
 
-async function getModuleIssues(moduleName: string, projectId: string, issueType: string, jiraUrl: string, currentSprint:string, userName: string, password: string){
+async function getModuleIssues(moduleName: string, parentIssueKey:string, inParent: boolean, issueType: string, jiraUrl: string, userName: string, password: string){
+
+    if (inParent) {
+        console.log(`Search ${moduleName} module issues for current regression sprint`);
+    } else {
+        console.log(`Search ${moduleName} module issues for previous sprints`);
+    }
 
     let issuesLinks:string = "";
 
@@ -75,7 +106,8 @@ async function getModuleIssues(moduleName: string, projectId: string, issueType:
         'Authorization': `Basic ` + Buffer.from(`${userName}:${password}`).toString('base64'),
         'Accept': 'application/json'
     }
-    const query: string = `/search?jql=project = ${projectId} AND issuetype = ${issueType} AND "Component[Dropdown]" = ${moduleName}`;
+    const operator: string = inParent ? "=" : "!="
+    const query: string = `/search?jql=parent ${operator} ${parentIssueKey} AND issuetype = ${issueType} AND "Component[Dropdown]" = ${moduleName} AND labels IN (Regression) AND labels NOT IN (FixedOnRegression)`;
     const url = jiraUrl.replace(/\/+$/, '') + query; // remove trailing slashes
     
     try {
@@ -89,11 +121,9 @@ async function getModuleIssues(moduleName: string, projectId: string, issueType:
 
         const result = JSON.parse(await response.text());
         if (result["issues"]) {
-            const hostname: string = getHostName(jiraUrl);
             const issuesArray = result["issues"];
             for (let index = 0; index < issuesArray.length; index++) {
-                const currentLink: string = `https://${hostname}/browse/${issuesArray[index]["key"]}`;
-                issuesLinks += `<p><a href=\"${currentLink}\" data-card-appearance=\"inline\">${currentLink}</a></p> `;
+                issuesLinks += `<p><ac:structured-macro ac:name=\"jira\" ac:schema-version=\"1\" ac:macro-id=\"e6f873c8-59d1-4ae2-82ff-bf8e2378369f\"><ac:parameter ac:name=\"server\">System JIRA</ac:parameter><ac:parameter ac:name=\"serverId\">ddb34fca-5878-3e2d-898b-cb89d86c7acf</ac:parameter><ac:parameter ac:name=\"key\">${issuesArray[index]["key"]}</ac:parameter></ac:structured-macro></p>`
             }
         }
     } catch (error) {
@@ -103,10 +133,13 @@ async function getModuleIssues(moduleName: string, projectId: string, issueType:
     return issuesLinks;
 }
 
-async function fillModulesIssues(modulesList: ModuleInfo[],projectId: string, issueType: string, jiraUrl: string, currentSprint:string, userName: string, password: string) {
+async function fillModulesIssues(modulesList: ModuleInfo[],parentIssueKey: string, issueType: string, jiraUrl: string,  userName: string, password: string) {
+
+    console.log(`Start search issues`);
+
     for (let index = 0; index < modulesList.length; index++) {
-        const sprintIssues: string = await getModuleIssues(modulesList[index].id, projectId, issueType, jiraUrl, currentSprint, userName, password) ;
-        const oldIssues: string = "";
+        const sprintIssues: string = await getModuleIssues(modulesList[index].id, parentIssueKey, true, issueType, jiraUrl, userName, password) ;
+        const oldIssues: string = await getModuleIssues(modulesList[index].id, parentIssueKey, false, issueType, jiraUrl, userName, password) ;
         modulesList[index].sprintIssues = sprintIssues;
         modulesList[index].oldIssues = oldIssues;
     }
@@ -116,8 +149,10 @@ async function fillModulesIssues(modulesList: ModuleInfo[],projectId: string, is
 
 async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo, confluenceUrl: string, userName: string, password: string){
 
-     const body: string = JSON.stringify(confluencePageSettings);
-     const headers = { 
+    console.log("Publishing Confluence page");
+
+    const body: string = JSON.stringify(confluencePageSettings);
+    const headers = { 
         'Authorization': `Basic ` + Buffer.from(`${userName}:${password}`).toString('base64'),
         'Content-Type': 'application/json'
     }
@@ -128,7 +163,7 @@ async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo,
             headers: headers
         });
 
-        return await response.json();
+        return response;
     
     } catch (error) {
         console.log(error)
@@ -136,18 +171,24 @@ async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo,
 }
 
 function createPageContent(modulesList: ModuleInfo[]){
-    let pageBody: string = '<table>';
+
+    console.log("Creating Confluence page content");
+
+    let pageBody: string = '<table><tbody>';
     let rowN: number = 0;
-    pageBody += '<tr> <th>#</th> <th>Module Name</th> <th>Module Version</th> <th>Existed integrations</th> <th>Type testing</th> <th>Issues from previous sprints</th> <th>Issues</th> </tr>'
+
+    pageBody += '<tr> <th>#</th> <th>Module Name</th> <th>Module Version</th> <th>Type testing</th> <th>Issues from previous sprints</th> <th>Issues</th> </tr>'
+
     for(let module of modulesList){
-        pageBody += `<tr> <td>${++ rowN}</td> <td>${module.id}</td> <td>${module.version}</td> <td></td> <td></td> <td>${module.oldIssues}</td> <td>${module.sprintIssues}</td> </tr>`
+        pageBody += `<tr> <td>${++ rowN}</td> <td>${module.id}</td> <td>${module.version}</td> <td></td> <td>${module.oldIssues}</td> <td>${module.sprintIssues}</td> </tr>`
     }
-    pageBody += '</table>';
+    pageBody += '</tbody></table>';
 
     return pageBody;
 }
 
 function createPageSettings(pageType: string, pageTitle: string, spaceKey: string, subpageId: number, pageBody: string, pageRepresentation: string): ConfluencePageInfo{
+
     const pageSettings: ConfluencePageInfo = 
     {
         type: pageType,
@@ -172,45 +213,52 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
 
+    context.log('HTTP trigger function processed a request.');
+    
     const login = process.env[loginSecretParam];
     const password = process.env[passwordSecretParam];
     const confluenceUrl = process.env[confluenceUrlParam];
     const jiraUrl = process.env[jiraUrlParam];
 
-    context.log('HTTP trigger function processed a request.');
-    const name = (req.query.name || (req.body && req.body.name));
-
     const configMapUrl = req.body && req.body.configMapUrl;
-    const responseMessage = name
-        ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-        : `Body: ${req.body}`;
+    const kustomizationUrl = req.body && req.body.kustomizationUrl;
+    const pageType = req.body && req.body.pageType; 
+    const pageTitle = req.body && req.body.pageTitle; 
+    const spaceKey = req.body && req.body.spaceKey; 
+    const subpageId = req.body && req.body.subpageId; 
+    const pageRepresentation = req.body && req.body.pageRepresentation;
+
+    const issueType = req.body && req.body.issueType;
+    const parentIssueKey = req.body && req.body.parentIssueKey;
+
+    let modulesList: any[] = configMapUrl ? await getModulesList(configMapUrl) : null;
+    modulesList = modulesList ? modulesList.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)): null;
+    if (modulesList) {
+        modulesList.unshift(await getPlatformVersion(kustomizationUrl));
+    }
+    modulesList = modulesList ? await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password) : null;
+
+    const pageBody = createPageContent(modulesList);
+    const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
+    const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
+
+    let responseMessage ;
+    let status= 200;
+    
+    if (publishResult && publishResult.status === 200) {
+        responseMessage = "Regression sprint report executed successfully."
+    } else {
+        responseMessage = publishResult ? await publishResult.json() : "Regression sprint report publishing error";
+        status =  publishResult ?  publishResult.status: 500;
+    }
+
+    console.log(responseMessage);
 
     context.res = {
-        // status: 200, /* Defaults to 200 */
+        status: status, 
         body: responseMessage
     };
 
-    const currentSprint = "7";
-
-    const pageType: string = "page"; 
-    const pageTitle: string = "new page"; 
-    const spaceKey: string = "PLREC"; 
-    const subpageId: number = 234160191; 
-    const pageRepresentation: string = "storage";
-
-    const projectId: string = "PT";
-    const issueType: string = "Bug";
-
-
-    let modulesList = configMapUrl ? await getModulesList(configMapUrl) : null;
-    modulesList = modulesList ? await fillModulesIssues(modulesList, projectId, issueType, jiraUrl, currentSprint, login, password) : null;
-    
-    const pageBody = createPageContent(modulesList);
-    const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
-    const res = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
-
-//    console.log(pageSettings);
-    console.log(res);
 };
 
 export default httpTrigger;
