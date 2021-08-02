@@ -39,12 +39,23 @@ interface ConfluencePageInfo
 }
 
 function getHostName(url: string){
-    const regexUrl = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i;
+    const regexUrl = /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i; // will return domain name without protocol and path %www.github.com%
     const matches = url.match(regexUrl);
     // extract hostname (will be null if no match is found)
     return matches && matches[1];
 }
 
+
+class Guard
+{
+    public static AgainstNull(argument: any, argumentName: string): any
+    {
+        if (argument == null)
+        {
+            throw new Error(`ArgumentNullException: ${argumentName} value cannot be null`) ;
+        }
+    }
+}
 
 async function getPlatformVersion(kustomizationUrl:string){
 
@@ -60,6 +71,8 @@ async function getPlatformVersion(kustomizationUrl:string){
         oldIssues: null,
         sprintIssues: null
     }
+
+    Guard.AgainstNull(platformVersion, 'platformVersion');
 
     return platformVersion;
 }
@@ -89,7 +102,12 @@ async function getModulesList(configMapUrl: string){
     const response = await fetch(configMapUrl);
     const doc = yaml.load(await response.text());
     let modulesList = doc["data"]?.["modules.json"];
-    return parseModulesVersion(JSON.parse(modulesList));
+    
+    const result = parseModulesVersion(JSON.parse(modulesList));
+    
+    Guard.AgainstNull(result, 'result');
+    
+    return result;
 }
 
 async function getModuleIssues(moduleName: string, parentIssueKey:string, inParent: boolean, issueType: string, jiraUrl: string, userName: string, password: string){
@@ -137,12 +155,17 @@ async function fillModulesIssues(modulesList: ModuleInfo[],parentIssueKey: strin
 
     console.log(`Start search issues`);
 
+    Guard.AgainstNull(modulesList, 'modulesList');
+    
     for (let index = 0; index < modulesList.length; index++) {
         const sprintIssues: string = await getModuleIssues(modulesList[index].id, parentIssueKey, true, issueType, jiraUrl, userName, password) ;
         const oldIssues: string = await getModuleIssues(modulesList[index].id, parentIssueKey, false, issueType, jiraUrl, userName, password) ;
         modulesList[index].sprintIssues = sprintIssues;
         modulesList[index].oldIssues = oldIssues;
     }
+    
+    Guard.AgainstNull(modulesList, 'modulesList');
+
     return modulesList;
 }
 
@@ -166,13 +189,15 @@ async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo,
         return response;
     
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
 function createPageContent(modulesList: ModuleInfo[]){
 
     console.log("Creating Confluence page content");
+
+    Guard.AgainstNull(modulesList, 'loginSecretParam');
 
     let pageBody: string = '<table><tbody>';
     let rowN: number = 0;
@@ -183,6 +208,8 @@ function createPageContent(modulesList: ModuleInfo[]){
         pageBody += `<tr> <td>${++ rowN}</td> <td>${module.id}</td> <td>${module.version}</td> <td></td> <td>${module.oldIssues}</td> <td>${module.sprintIssues}</td> </tr>`
     }
     pageBody += '</tbody></table>';
+
+    Guard.AgainstNull(pageBody, 'pageBody');
 
     return pageBody;
 }
@@ -205,6 +232,8 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
         }
     };
 
+    Guard.AgainstNull(pageSettings, 'pageSettings');
+
     return pageSettings;
 }
 
@@ -212,51 +241,70 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
 
     context.log('HTTP trigger function processed a request.');
-    
-    const login = process.env[loginSecretParam];
-    const password = process.env[passwordSecretParam];
-    const confluenceUrl = process.env[confluenceUrlParam];
-    const jiraUrl = process.env[jiraUrlParam];
-
-    const configMapUrl = req.body && req.body.configMapUrl;
-    const kustomizationUrl = req.body && req.body.kustomizationUrl;
-    const pageType = req.body && req.body.pageType; 
-    const pageTitle = req.body && req.body.pageTitle; 
-    const spaceKey = req.body && req.body.spaceKey; 
-    const subpageId = req.body && req.body.subpageId; 
-    const pageRepresentation = req.body && req.body.pageRepresentation;
-
-    const issueType = req.body && req.body.issueType;
-    const parentIssueKey = req.body && req.body.parentIssueKey;
-
-    let modulesList: any[] = configMapUrl ? await getModulesList(configMapUrl) : null;
-    modulesList = modulesList ? modulesList.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0)): null;
-    if (modulesList) {
-        modulesList.unshift(await getPlatformVersion(kustomizationUrl));
-    }
-    modulesList = modulesList ? await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password) : null;
-
-    const pageBody = createPageContent(modulesList);
-    const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
-    const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
 
     let responseMessage ;
     let status= 200;
-    
-    if (publishResult && publishResult.status === 200) {
-        responseMessage = "Regression sprint report executed successfully."
-    } else {
-        responseMessage = publishResult ? await publishResult.json() : "Regression sprint report publishing error";
-        status =  publishResult ?  publishResult.status: 500;
-    }
 
-    console.log(responseMessage);
+    try {
+        
+        const login = process.env[loginSecretParam];
+        Guard.AgainstNull(login, loginSecretParam);
+        const password = process.env[passwordSecretParam];
+        Guard.AgainstNull(password, passwordSecretParam);
+        const confluenceUrl = process.env[confluenceUrlParam];
+        Guard.AgainstNull(confluenceUrl, confluenceUrlParam);
+        const jiraUrl = process.env[jiraUrlParam];
+        Guard.AgainstNull(jiraUrl, jiraUrlParam);
+
+        const configMapUrl = req.body && req.body.configMapUrl;
+        Guard.AgainstNull(configMapUrl, 'configMapUrl');
+        const kustomizationUrl = req.body && req.body.kustomizationUrl;
+        Guard.AgainstNull(kustomizationUrl, 'kustomizationUrl');
+        const pageType = req.body && req.body.pageType; 
+        Guard.AgainstNull(pageType, 'pageType');
+        const pageTitle = req.body && req.body.pageTitle; 
+        Guard.AgainstNull(pageTitle, 'pageTitle');
+        const spaceKey = req.body && req.body.spaceKey; 
+        Guard.AgainstNull(spaceKey, 'spaceKey');
+        const subpageId = req.body && req.body.subpageId; 
+        Guard.AgainstNull(subpageId, 'subpageId');
+        const pageRepresentation = req.body && req.body.pageRepresentation;
+        Guard.AgainstNull(pageRepresentation, 'pageRepresentation');
+
+        const issueType = req.body && req.body.issueType;
+        Guard.AgainstNull(issueType, 'issueType');
+        const parentIssueKey = req.body && req.body.parentIssueKey;
+        Guard.AgainstNull(parentIssueKey, 'parentIssueKey');
+
+        let modulesList: any[] = await getModulesList(configMapUrl);
+        modulesList = modulesList.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+        modulesList.unshift(await getPlatformVersion(kustomizationUrl));
+        
+        modulesList = await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password);
+
+        const pageBody = createPageContent(modulesList);
+        const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
+        const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
+
+        if (publishResult && publishResult.status === 200) {
+            responseMessage = "Regression sprint report executed successfully."
+        } else {
+            responseMessage = publishResult ? await publishResult.json() : "Regression sprint report publishing error";
+            status =  publishResult ?  publishResult.status: 500;
+        }
+
+        console.log(responseMessage);
+
+    } catch (error) {
+        console.error(error);
+        status = 500;
+        responseMessage = error;
+    }
 
     context.res = {
         status: status, 
         body: responseMessage
     };
-
 };
 
 export default httpTrigger;
