@@ -187,29 +187,27 @@ function createPageContent(modulesList: ModuleInfo[]){
     return pageBody;
 }
 
-function createPageSettings(pageType: string, pageTitle: string, spaceKey: string, subpageId: number, pageBody: string, pageRepresentation: string): ConfluencePageInfo{
-
-    const pageSettings: ConfluencePageInfo = 
-    {
+function createPageSettings(pageType: string, pageTitle: string, spaceKey: string, subpageId: number, pageBody: string, pageRepresentation: string): ConfluencePageInfo {
+    const pageSettings: ConfluencePageInfo = {
         type: pageType,
         title: pageTitle,
-        ancestors:[
-            {
-                id: subpageId
-            }
-        ], 
-        space:{
+        ancestors: [{
+            id: subpageId
+        }], 
+        space: {
             key: spaceKey
         },
-        body:{
-            storage:{
+        body: {
+            storage: {
                 value: pageBody,
                 representation: pageRepresentation
             }
         }
     };
+
     return pageSettings;
 }
+
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
 
