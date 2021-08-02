@@ -237,6 +237,28 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
     return pageSettings;
 }
 
+async function checkPageNotExist(pageTitle:string, spaceKey: string, confluenceUrl: string, userName: string, password: string) {
+    console.log("Publishing Confluence page");
+
+    const queryUrl: string = confluenceUrl + `\?title=${pageTitle}&spaceKey=${spaceKey}&status=current`;
+    const headers = { 
+        'Authorization': `Basic ` + Buffer.from(`${userName}:${password}`).toString('base64'),
+    }
+    try {
+        const response = await fetch(queryUrl, {
+            method: 'GET',
+            headers: headers
+        });
+
+        let resJson = await response.json();
+        let result = resJson["size"] > 0 ? false: true;
+        return result;
+    
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
 
@@ -276,30 +298,36 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         const parentIssueKey = req.body && req.body.parentIssueKey;
         Guard.AgainstNull(parentIssueKey, 'parentIssueKey');
 
-        let modulesList: any[] = await getModulesList(configMapUrl);
-        modulesList = modulesList.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
-        modulesList.unshift(await getPlatformVersion(kustomizationUrl));
-        
-        modulesList = await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password);
+        if (await checkPageNotExist(pageTitle, spaceKey, confluenceUrl, login, password)) {
 
-        const pageBody = createPageContent(modulesList);
-        const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
-        const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
-
-        if (publishResult && publishResult.status === 200) {
-            responseMessage = "Regression sprint report executed successfully."
+            let modulesList: any[] = await getModulesList(configMapUrl);
+            modulesList = modulesList.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+            modulesList.unshift(await getPlatformVersion(kustomizationUrl));
+            
+            modulesList = await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password);
+    
+            const pageBody = createPageContent(modulesList);
+            const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
+            const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
+    
+            if (publishResult && publishResult.status === 200) {
+                responseMessage = "Regression sprint report executed successfully."
+            } else {
+                responseMessage = publishResult ? await publishResult.json() : "Regression sprint report publishing error";
+                status =  publishResult ?  publishResult.status: 400;
+            }
         } else {
-            responseMessage = publishResult ? await publishResult.json() : "Regression sprint report publishing error";
-            status =  publishResult ?  publishResult.status: 500;
+            responseMessage = `Page with "${pageTitle}" title already exists.`;
+            status = 400;
         }
-
-        console.log(responseMessage);
 
     } catch (error) {
         console.error(error);
-        status = 500;
+        status = 400;
         responseMessage = error;
     }
+
+    console.log(responseMessage);
 
     context.res = {
         status: status, 
