@@ -58,6 +58,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
+        shell: bash
         run: |
           azure_cfg="--resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \ 
           --template-file ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/main.bicep \
