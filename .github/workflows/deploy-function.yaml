@@ -59,11 +59,11 @@ jobs:
 
       - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
         run: |
-          azure_cfg="--resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }}\
-          --template-file ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/main.bicep\
-          --parameters packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip\
-          ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }}\
-          ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }}\
+          azure_cfg="--resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \
+          --template-file ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/main.bicep \
+          --parameters packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip \
+          ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
+          ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }} \
           functionAppName=${{ env.SPRINT_REPORT_PACKAGE_NAME }}-prod"
           echo $azure_cfg
           az deployment group create $azure_cfg
