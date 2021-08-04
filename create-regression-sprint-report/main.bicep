@@ -1,7 +1,7 @@
 param functionAppName string = 'create-regression-report'
-param storageAccountName string  = 'createregressionreport'
+param storageAccountName string  = '${functionAppName}-StorageAccount'
 param packagePath string
-param appServicePlanName string = 'ASP-create-regression-report-eb31'
+param appServicePlanName string = '${functionAppName}-ServicePlan'
 param location string = resourceGroup().location
 
 @secure()
