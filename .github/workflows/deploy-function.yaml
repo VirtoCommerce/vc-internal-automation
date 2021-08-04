@@ -65,5 +65,4 @@ jobs:
           ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
           ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }} \
           functionAppName=${{ env.SPRINT_REPORT_PACKAGE_NAME }}-prod"
-          echo $azure_cfg
           az deployment group create $azure_cfg
