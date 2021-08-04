@@ -38,8 +38,10 @@ jobs:
           path: ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip
           if-no-files-found: error
   
-  production:
+  deploy:
       needs: build
+      environment:
+        name: production
       runs-on: ubuntu-latest
       steps:
 
