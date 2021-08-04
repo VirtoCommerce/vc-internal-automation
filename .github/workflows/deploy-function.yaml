@@ -1,0 +1,57 @@
+name: Build and deploy Node.js project to Azure Function App
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "create-regression-sprint-report"
+  workflow_dispatch:
+
+env:
+  SPRINT_REPORT_PACKAGE_NAME: 'create-regression-sprint-report'
+  NODE_VERSION: '14.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 'Build an package'
+        working-directory: ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}
+        run: |
+          npm ci
+          npm i -g azure-functions-core-tools@3 --unsafe-perm true
+          npm run pack
+
+      - name: 'Upload package'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
+          path: ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip
+          if-no-files-found: error
+  
+  production:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+
+      - name: 'Download package'
+        uses: actions/download-artifact@master
+        with:
+          name: ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
+      
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+
+
