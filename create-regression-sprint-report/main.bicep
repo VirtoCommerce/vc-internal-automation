@@ -1,5 +1,5 @@
 param functionAppName string = 'create-regression-report'
-param storageAccountName string  = '${substring(replace(functionAppName, '-', ''), 0, 10)}-{uniqueString(resourceGroup().id)}'
+param storageAccountName string  = '${toLower(substring(replace(functionAppName, '-', ''), 0, 10))}${uniqueString(resourceGroup().id)}'
 param packagePath string
 param appServicePlanName string = '${replace(functionAppName, '-', '')}-ServicePlan'
 param location string = resourceGroup().location
