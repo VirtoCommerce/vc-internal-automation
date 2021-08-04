@@ -58,7 +58,6 @@ jobs:
 
       - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
         run: |
-          /bin/sh -c """
           az deployment group create \ 
           --resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \
           --template-file main.bicep \
@@ -66,7 +65,6 @@ jobs:
           packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip \
           ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
           ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }}
-          """
 
 
 
