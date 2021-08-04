@@ -58,12 +58,12 @@ jobs:
 
       - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
         run: |
-          az deployment group create | 
-          --resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} |
-          --template-file main.bicep |
-          --parameters |
-             packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip
-             ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }}
+          az deployment group create \ 
+          --resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \
+          --template-file main.bicep \
+          --parameters \
+             packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip \
+             ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
              ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }}
 
 
