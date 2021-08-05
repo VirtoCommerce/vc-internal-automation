@@ -11,7 +11,6 @@ on:
 env:
   SPRINT_REPORT_PACKAGE_NAME: 'create-regression-sprint-report'
   NODE_VERSION: '14.x'
-  FUNCTION_APP_NAME: ${{ env.SPRINT_REPORT_PACKAGE_NAME }}-prod
 
 jobs:
   build:
@@ -39,6 +38,8 @@ jobs:
           if-no-files-found: error
   
   deploy:
+      env:
+        FUNCTION_APP_NAME: '${{ env.SPRINT_REPORT_PACKAGE_NAME }}-prod'
       needs: build
       environment:
         name: production
