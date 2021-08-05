@@ -1,6 +1,6 @@
-param appNameSuffix string = 'create-regression-report'
-param storageAccountName string  = 'fnstor${toLower(substring(replace(appNameSuffix, '-', ''), 0, 17))}'
-param appServicePlanName string = 'fn-${replace(appNameSuffix, '-', '')}-ServicePlan'
+param functionAppName string = 'create-regression-report'
+param storageAccountName string  = 'fnstor${toLower(substring(replace(functionAppName, '-', ''), 0, 17))}'
+param appServicePlanName string = 'fn-${replace(functionAppName, '-', '')}-ServicePlan'
 param location string = resourceGroup().location
 
 @secure()
@@ -11,8 +11,6 @@ param ConfluenceToken string
 param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api/content/'
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
 
-
-var functionAppName = 'fn-${appNameSuffix}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: storageAccountName
