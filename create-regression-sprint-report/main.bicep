@@ -1,7 +1,6 @@
-param functionAppName string = 'create-regression-report'
-param storageAccountName string  = '${toLower(substring(replace(functionAppName, '-', ''), 0, 10))}${uniqueString(resourceGroup().id)}'
-param packagePath string
-param appServicePlanName string = '${replace(functionAppName, '-', '')}-ServicePlan'
+param appNameSuffix string = 'create-regression-report'
+param storageAccountName string  = 'fnstor${toLower(substring(replace(appNameSuffix, '-', ''), 0, 17))}'
+param appServicePlanName string = 'fn-${replace(appNameSuffix, '-', '')}-ServicePlan'
 param location string = resourceGroup().location
 
 @secure()
@@ -12,6 +11,8 @@ param ConfluenceToken string
 param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api/content/'
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
 
+
+var functionAppName = 'fn-${appNameSuffix}'
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: storageAccountName
@@ -25,7 +26,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
 }
 
-resource appservice_plan 'Microsoft.Web/serverfarms@2020-12-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2020-12-01' = {
   name: appServicePlanName
   location: location
   sku: {
@@ -38,9 +39,12 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
   name: functionAppName
   location: location
   kind: 'functionapp'
-
+  dependsOn: [
+    appServicePlan
+    storageAccount
+  ]
   properties: {
-    serverFarmId: appservice_plan.id
+    serverFarmId: appServicePlan.id
     siteConfig: {
       appSettings: [
         
@@ -79,10 +83,6 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
         {
           name: 'JiraUrl'
           value: JiraUrl
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: packagePath
         }
         // WEBSITE_CONTENTSHARE will also be auto-generated - https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#website_contentshare
         // WEBSITE_RUN_FROM_PACKAGE will be set to 1 by func azure functionapp publish
