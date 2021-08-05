@@ -1,4 +1,4 @@
-name: Build and deploy Node.js project to Azure Function App
+name: Build and deploy Azure Function App
 
 on:
   push:
@@ -11,13 +11,14 @@ on:
 env:
   SPRINT_REPORT_PACKAGE_NAME: 'create-regression-sprint-report'
   NODE_VERSION: '14.x'
+  FUNCTION_APP_NAME: ''
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v1
@@ -39,11 +40,18 @@ jobs:
           if-no-files-found: error
   
   deploy:
+      if: github.ref == 'refs/heads/master'
       needs: build
       environment:
         name: production
       runs-on: ubuntu-latest
       steps:
+
+      - name: Set variables
+        run: |
+          echo "FUNCTION_APP_NAME=${{ env.SPRINT_REPORT_PACKAGE_NAME }}-prod" >> $GITHUB_ENV
+      
+      - uses: actions/checkout@v2
 
       - name: 'Download package'
         uses: actions/download-artifact@master
@@ -56,16 +64,17 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}
+      - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }} Azure function app
         run: |
-          az deployment group create \ 
-          --resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \
-          --template-file main.bicep \
-          --parameters \
-          packagePath=./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip \
-          ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
-          ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }}
+          azure_cfg="--resource-group ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} \
+          --template-file ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}/main.bicep \
+          --parameters ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
+          ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }} \
+          functionAppName=${{ env.FUNCTION_APP_NAME }}"
+          az deployment group create $azure_cfg
 
-
+      - name: Azure deploy ${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip package
+        run: |
+          az functionapp deployment source config-zip -g ${{ secrets.AZURE_FUNCTIONS_RESOURCE_GROUP }} -n ${{ env.FUNCTION_APP_NAME }} --src ./${{ env.SPRINT_REPORT_PACKAGE_NAME }}.zip
 
 
