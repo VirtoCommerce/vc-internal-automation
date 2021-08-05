@@ -76,6 +76,14 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
           value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, storageAccount.apiVersion).keys[0].value}'
         }
         {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsights.properties.InstrumentationKey
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: 'InstrumentationKey=${appInsights.properties.InstrumentationKey}'
+        }
+        {
           name: 'WEBSITE_NODE_DEFAULT_VERSION'
           value: '~14'
         }
