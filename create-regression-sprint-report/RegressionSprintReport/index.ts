@@ -193,15 +193,17 @@ async function publishConfluencePage(confluencePageSettings: ConfluencePageInfo,
     }
 }
 
-function createPageContent(modulesList: ModuleInfo[]){
+function createPageContent(modulesList: ModuleInfo[], parentIssueKey: string){
 
     console.log("Creating Confluence page content");
 
     Guard.AgainstNull(modulesList, 'loginSecretParam');
 
-    let pageBody: string = '<table><tbody>';
+    let pageBody: string = `<p><ac:structured-macro ac:name=\"jira\" ac:schema-version=\"1\" ac:macro-id=\"e6f873c8-59d1-4ae2-82ff-bf8e2378369f\"><ac:parameter ac:name=\"server\">System JIRA</ac:parameter><ac:parameter ac:name=\"serverId\">ddb34fca-5878-3e2d-898b-cb89d86c7acf</ac:parameter><ac:parameter ac:name=\"key\">${parentIssueKey}</ac:parameter></ac:structured-macro></p>`;
     let rowN: number = 0;
 
+    pageBody += '<p></p>'
+    pageBody += '<table><tbody>'
     pageBody += '<tr> <th>#</th> <th>Module Name</th> <th>Module Version</th> <th>Type testing</th> <th>Issues from previous sprints</th> <th>Issues</th> </tr>'
 
     for(let module of modulesList){
@@ -306,7 +308,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             
             modulesList = await fillModulesIssues(modulesList, parentIssueKey, issueType, jiraUrl, login, password);
     
-            const pageBody = createPageContent(modulesList);
+            const pageBody = createPageContent(modulesList, parentIssueKey);
             const pageSettings = createPageSettings(pageType, pageTitle,spaceKey, subpageId, pageBody,pageRepresentation);
             const publishResult = await publishConfluencePage(pageSettings, confluenceUrl, login, password);
     
