@@ -1,7 +1,7 @@
 param functionAppName string = 'create-regression-report'
 param storageAccountName string  = 'fnstor${toLower(substring(replace(functionAppName, '-', ''), 0, 17))}'
-param appServicePlanName string = 'fn-${replace(functionAppName, '-', '')}-ServicePlan'
-param appInsightsName string = 'fn-${replace(functionAppName, '-', '')}-AppInsights'
+param appServicePlanName string = 'fn-${functionAppName}-ServicePlan'
+param appInsightsName string = 'fn-${functionAppName}-AppInsights'
 param location string = resourceGroup().location
 
 @secure()
