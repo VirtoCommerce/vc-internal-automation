@@ -13,12 +13,13 @@ param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api/
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
 
 
-resource appInsights 'Microsoft.Insights/components@2018-05-01-preview' = {
+resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: appInsightsName
   location: location
   kind: 'web'
   properties: {
     Application_Type: 'web'
+    IngestionMode: 'ApplicationInsights'
     publicNetworkAccessForIngestion: 'Enabled'
     publicNetworkAccessForQuery: 'Enabled'
   }
