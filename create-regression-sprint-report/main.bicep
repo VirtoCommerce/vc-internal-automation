@@ -1,6 +1,7 @@
 param functionAppName string = 'create-regression-report'
 param storageAccountName string  = 'fnstor${toLower(substring(replace(functionAppName, '-', ''), 0, 17))}'
 param appServicePlanName string = 'fn-${replace(functionAppName, '-', '')}-ServicePlan'
+param appInsightsName string = 'fn-${replace(functionAppName, '-', '')}-AppInsights'
 param location string = resourceGroup().location
 
 @secure()
@@ -11,6 +12,17 @@ param ConfluenceToken string
 param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api/content/'
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
 
+
+resource appInsights 'Microsoft.Insights/components@2018-05-01-preview' = {
+  name: appInsightsName
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    publicNetworkAccessForIngestion: 'Enabled'
+    publicNetworkAccessForQuery: 'Enabled'
+  }
+}
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: storageAccountName
@@ -40,6 +52,7 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
   dependsOn: [
     appServicePlan
     storageAccount
+    appInsights
   ]
   properties: {
     serverFarmId: appServicePlan.id
@@ -84,6 +97,11 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
         }
         // WEBSITE_CONTENTSHARE will also be auto-generated - https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#website_contentshare
         // WEBSITE_RUN_FROM_PACKAGE will be set to 1 by func azure functionapp publish
+        // WEBSITE_RUN_FROM_PACKAGE use to deploy azure function from zip package. Value shoul be public access url with zip package for download
+        // {
+        //   name: 'WEBSITE_RUN_FROM_PACKAGE'
+        //   value: 'https://github.com/mjisaak/azure-func-with-bicep/releases/download/v0.0.1/function.zip'
+        // }
       ]
     }
   }
