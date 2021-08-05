@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "create-regression-sprint-report"
+      - 'create-regression-sprint-report/**'
   workflow_dispatch:
 
 env:
