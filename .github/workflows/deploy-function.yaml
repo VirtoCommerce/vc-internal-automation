@@ -40,7 +40,7 @@ jobs:
           if-no-files-found: error
   
   deploy:
-#      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       needs: build
       environment:
         name: production
