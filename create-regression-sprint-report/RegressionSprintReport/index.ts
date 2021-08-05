@@ -240,7 +240,7 @@ function createPageSettings(pageType: string, pageTitle: string, spaceKey: strin
 }
 
 async function checkPageNotExist(pageTitle:string, spaceKey: string, confluenceUrl: string, userName: string, password: string) {
-    console.log("Publishing Confluence page");
+    console.log("Check Confluence page exists");
 
     const queryUrl: string = confluenceUrl + `\?title=${pageTitle}&spaceKey=${spaceKey}&status=current`;
     const headers = { 
