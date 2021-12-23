@@ -457,3 +457,7 @@ local.settings.json
 
 #REST client files
 .http
+.vscode/extensions.json
+.vscode/launch.json
+.vscode/settings.json
+.vscode/tasks.json
