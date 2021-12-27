@@ -16,5 +16,5 @@
       "name": "res"
     }
   ],
-  "scriptFile": "../dist/GetCodeSmells/index.js"
+  "scriptFile": "../dist/GetSonarMetrics/index.js"
 }
