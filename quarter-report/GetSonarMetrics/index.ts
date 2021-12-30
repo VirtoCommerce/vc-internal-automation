@@ -8,17 +8,28 @@ const MAINTAINABILITY = 'sqale_rating'
 const CODE_SMELLS = 'code_smells'
 const COVERAGE = 'coverage'
 const FULL_REPORT = 'full_report'
+const GATE_FILED = 'ERROR'
+
+const LIGHT_RED = '#FFCCCB'
+const DARK_YELLOW = '#CCCC00'
+const LIGHT_BLUE = '#87CEFA'
+const DARK_GREEN = '#00CC66'
+
+
+
 
 const metricValues: string[] = [QUALITY_GATE, RELIABILITY, SECURITY, MAINTAINABILITY, CODE_SMELLS, COVERAGE]
 
 type ComponentInfo = 
 {
     qualityGateValue: string,
+    qualityGateColor: string,
     reliabilityValue: string,
     securityValue: string,
     maintainabilityValue: string,
     codeSmellValue: string,
-    coverageValue: string
+    coverageValue: string,
+    coverageColor: string
 }
 
 interface ComponentDict 
@@ -50,12 +61,14 @@ function createComponentMetrics(componentList:string [], sonarMetricsList: Sonar
         let filteredSonarMetricsList = sonarMetricsList.filter(metric => metric.component.includes(component));
 
         componentMetrics[component] = {
-            qualityGateValue: filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE)).value : '',
-            reliabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY)).value : '',
-            securityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY)).value : '',
-            maintainabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY)).value : '',
-            codeSmellValue: filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS)).value : '',
-            coverageValue: filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE)).value : ''
+            qualityGateValue: filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE)).value : null,
+            qualityGateColor: null,
+            reliabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY)).value : null,
+            securityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY)).value : null,
+            maintainabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY)).value : null,
+            codeSmellValue: filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS)).value : null,
+            coverageValue: filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE)).value : null,
+            coverageColor: null
         };
     });
     return componentMetrics;
@@ -77,7 +90,9 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
 
     for(let component of componentList){
-        pageBody += `<tr> <td>${++ rowN}</td> <td>${component}</td> <td>${componentMetrics[component].qualityGateValue}</td> <td>${componentMetrics[component].reliabilityValue}</td> <td>${componentMetrics[component].securityValue}</td> <td>${componentMetrics[component].maintainabilityValue}</td> <td>${componentMetrics[component].codeSmellValue}</td> <td>${componentMetrics[component].coverageValue}</td> </tr>`
+        const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
+        const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
+        pageBody += `<tr> <td>${++ rowN}</td> <td>${component}</td> <td${gateColor}>${componentMetrics[component].qualityGateValue}</td> <td>${componentMetrics[component].reliabilityValue}</td> <td>${componentMetrics[component].securityValue}</td> <td>${componentMetrics[component].maintainabilityValue}</td> <td>${componentMetrics[component].codeSmellValue}</td> <td${coverageColor}>${componentMetrics[component].coverageValue}</td> </tr>`
     }
     pageBody += '</tbody></table>';
 
@@ -111,6 +126,32 @@ function createPageContent(componentList: SonarResponse[], metricName: string){
     return pageBody;
 }
 
+function fillColors(componentList:string [], componentMetrics: ComponentDict) {
+    for(let component of componentList){
+        if(componentMetrics[component].qualityGateValue === GATE_FILED ){
+            componentMetrics[component].qualityGateColor = LIGHT_RED;
+        }
+        const coverageFloatValue = componentMetrics[component].coverageValue ? parseFloat(componentMetrics[component].coverageValue) : null;
+        componentMetrics[component].coverageColor = coverageFloatValue != null ? calculateCoverageColor(coverageFloatValue) : null;
+    }
+    return componentMetrics;
+}
+
+function calculateCoverageColor(metricValue: number) {
+    let result = LIGHT_RED;
+
+    if (metricValue >= 30) {
+        result = DARK_YELLOW;
+    }
+    if (metricValue >= 50) {
+        result = LIGHT_BLUE;
+    }
+    if (metricValue >= 80) {
+        result = DARK_GREEN;
+    }
+
+    return result
+}
 
 async function getMetricValues(sonarUrl: string) {
 
@@ -146,7 +187,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     if (metric === FULL_REPORT) {
         const queryUrl: string = `${baseUrl}?projectKeys=${componentListString}&metricKeys=${metricValues.toString()}`
         const metricsList: SonarResponse[] = await getMetricValues(queryUrl);
-        const componentMetrics = createComponentMetrics(componentList,metricsList);
+        let componentMetrics = createComponentMetrics(componentList,metricsList);
+        componentMetrics = fillColors(componentList, componentMetrics);
         const pageContent = createQualityPageContent(componentList,componentMetrics);
         status = 200;
         responseMessage = pageContent;
@@ -159,4 +201,4 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
 };
 
-export default httpTrigger;
+export default httpTrigger; 
