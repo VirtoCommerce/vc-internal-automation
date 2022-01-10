@@ -90,11 +90,10 @@ function createComponentMetrics(componentList:string [], sonarMetricsList: Sonar
 
 function createQualityPageContent(componentList:string [], componentMetrics: ComponentDict){
 
-    console.log("Creating Confluence page content");
+    console.log("Creating Confluence Quality page content");
 
     Guard.AgainstNull(componentList, 'componentList');
 
-//    let pageBody: string = `<p><ac:structured-macro ac:name=\"jira\" ac:schema-version=\"1\" ac:macro-id=\"e6f873c8-59d1-4ae2-82ff-bf8e2378369f\"><ac:parameter ac:name=\"server\">System JIRA</ac:parameter><ac:parameter ac:name=\"serverId\">ddb34fca-5878-3e2d-898b-cb89d86c7acf</ac:parameter><ac:parameter ac:name=\"key\">${parentIssueKey}</ac:parameter></ac:structured-macro></p>`;
     let pageBody: string = '';
     let rowN: number = 0;
 
@@ -111,8 +110,31 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
 
     Guard.AgainstNull(pageBody, 'pageBody');
 
+    pageBody += createPageLegend();
+
     return pageBody;
 }
+
+
+function createPageLegend(){
+
+    console.log("Creating page Legend content");
+
+    let legendBody: string = '';
+
+    legendBody += '<p></p>'
+    legendBody += '<p>CodeCoverage Legend</p>'
+    legendBody += '<table><tbody>'
+    legendBody += `<tr style="color:${LIGHT_RED};"><td>&#8226</td> <td>0%-29%</td></tr>`
+    legendBody += `<tr style="color:${DARK_YELLOW};"><td>&#8226</td> <td>30%-49%</td></tr>`
+    legendBody += `<tr style="color:${LIGHT_BLUE};"><td>&#8226</td> <td>50%-79%</td></tr>`
+    legendBody += `<tr style="color:${DARK_GREEN};"><td>&#8226</td> <td>80%-100%</td></tr>`
+   
+    legendBody += '</tbody></table>';
+
+    return legendBody;
+}
+
 
 
 function createPageContent(componentList: SonarResponse[], metricName: string){
@@ -121,7 +143,6 @@ function createPageContent(componentList: SonarResponse[], metricName: string){
 
     Guard.AgainstNull(componentList, 'componentList');
 
-//    let pageBody: string = `<p><ac:structured-macro ac:name=\"jira\" ac:schema-version=\"1\" ac:macro-id=\"e6f873c8-59d1-4ae2-82ff-bf8e2378369f\"><ac:parameter ac:name=\"server\">System JIRA</ac:parameter><ac:parameter ac:name=\"serverId\">ddb34fca-5878-3e2d-898b-cb89d86c7acf</ac:parameter><ac:parameter ac:name=\"key\">${parentIssueKey}</ac:parameter></ac:structured-macro></p>`;
     let pageBody: string = '';
     let rowN: number = 0;
 
