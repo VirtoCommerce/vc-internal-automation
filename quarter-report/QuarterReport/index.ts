@@ -244,7 +244,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         if (publishResult && publishResult.status === 200) {
             responseMessage = `Page "${pageTitle}" created.`;
         } else {
-            responseMessage = publishResult ? await publishResult.json() : "Report creation error.";
+            var errorResult = await publishResult.json(); 
+            responseMessage = errorResult?.message as string ?? "Report creation error.";
             status =  publishResult ?  publishResult.status: 400;
         }
     } catch(error) {
