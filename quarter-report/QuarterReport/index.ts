@@ -36,6 +36,14 @@ interface ConfluencePageInfo
     }
 }
 
+interface FindPagesResult {
+    results: [
+        {
+            id: string
+        }
+    ]
+}
+
 function createPageInfo(pageType: string, pageTitle: string, spaceKey: string, subPageId: number, pageBody: string, pageRepresentation: string): ConfluencePageInfo {
     const pageSettings: ConfluencePageInfo = {
         type: pageType,
@@ -74,9 +82,10 @@ async function findPage(pageTitle:string, spaceKey: string, confluenceUrl: strin
             headers: headers
         });
 
-        let apiResult = await response.json();
+        let apiResult = await response.json() as FindPagesResult;
+        
         var result = apiResult?.results?.length 
-            ? apiResult.results[0].id as string
+            ? apiResult.results[0].id
             : null;
 
         return result;
