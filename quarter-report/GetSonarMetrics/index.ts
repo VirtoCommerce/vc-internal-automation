@@ -104,7 +104,19 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     for(let component of componentList){
         const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
         const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
-        pageBody += `<tr> <td>${++ rowN}</td> <td>${component}</td> <td${gateColor}>${componentMetrics[component].qualityGateValue}</td> <td>${componentMetrics[component].reliabilityValue}</td> <td>${componentMetrics[component].securityValue}</td> <td>${componentMetrics[component].maintainabilityValue}</td> <td>${componentMetrics[component].codeSmellValue}</td> <td${coverageColor}>${componentMetrics[component].coverageValue}</td> </tr>`
+        const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
+        const securityColor = componentMetrics[component].securityColor ? ` bgcolor="${componentMetrics[component].securityColor}"` : '';
+        const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` bgcolor="${componentMetrics[component].maintainabilityColor}"` : '';
+        const codeSmellColor = componentMetrics[component].codeSmellColor ? ` bgcolor="${componentMetrics[component].codeSmellColor}"` : '';
+
+        pageBody += `<tr> `
+        pageBody += `<td>${++ rowN}</td> `
+        pageBody += `<td>${component}</td> <td${gateColor}>${componentMetrics[component].qualityGateValue}</td> `
+        pageBody += `<td${reliabilityColor}>${componentMetrics[component].reliabilityValue}</td> `
+        pageBody += `<td${securityColor}>${componentMetrics[component].securityValue}</td> `
+        pageBody += `<td${maintainabilityColor}>${componentMetrics[component].maintainabilityValue}</td> `
+        pageBody += `<td${codeSmellColor}>${componentMetrics[component].codeSmellValue}</td> <td${coverageColor}>${componentMetrics[component].coverageValue}</td> `
+        pageBody += `</tr>`
     }
     pageBody += '</tbody></table>';
 
@@ -134,8 +146,6 @@ function createPageLegend(){
 
     return legendBody;
 }
-
-
 
 function createPageContent(componentList: SonarResponse[], metricName: string){
 
