@@ -21,6 +21,8 @@ const SONAR_YELLOW = '#EABE06'
 const SONAR_ORANGE = '#ED7D20'
 const SONAR_RED = '#D4333F'
 
+const BULLET_SYMBOL = '&#8226'
+
 
 
 const metricValues: string[] = [QUALITY_GATE, RELIABILITY, SECURITY, MAINTAINABILITY, CODE_SMELLS, COVERAGE]
@@ -137,10 +139,10 @@ function createPageLegend(){
     legendBody += '<p></p>'
     legendBody += '<p>CodeCoverage Legend</p>'
     legendBody += '<table><tbody>'
-    legendBody += `<tr style="color:${LIGHT_RED};"><td>&#8226</td> <td>0%-29%</td></tr>`
-    legendBody += `<tr style="color:${DARK_YELLOW};"><td>&#8226</td> <td>30%-49%</td></tr>`
-    legendBody += `<tr style="color:${LIGHT_BLUE};"><td>&#8226</td> <td>50%-79%</td></tr>`
-    legendBody += `<tr style="color:${DARK_GREEN};"><td>&#8226</td> <td>80%-100%</td></tr>`
+    legendBody += `<tr style="color:${LIGHT_RED};"><td>${BULLET_SYMBOL}</td> <td>0%-29%</td></tr>`
+    legendBody += `<tr style="color:${DARK_YELLOW};"><td>${BULLET_SYMBOL}</td> <td>30%-49%</td></tr>`
+    legendBody += `<tr style="color:${LIGHT_BLUE};"><td>${BULLET_SYMBOL}</td> <td>50%-79%</td></tr>`
+    legendBody += `<tr style="color:${DARK_GREEN};"><td>${BULLET_SYMBOL}</td> <td>80%-100%</td></tr>`
    
     legendBody += '</tbody></table>';
 
