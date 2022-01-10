@@ -15,6 +15,11 @@ const DARK_YELLOW = '#CCCC00'
 const LIGHT_BLUE = '#87CEFA'
 const DARK_GREEN = '#00CC66'
 
+const SONAR_GREEN = '#6ACD6A'
+const SONAR_GREEN_YELLOW = '#B0D513'
+const SONAR_YELLOW = '#EABE06'
+const SONAR_ORANGE = '#ED7D20'
+const SONAR_RED = '#D4333F'
 
 
 
@@ -25,9 +30,13 @@ type ComponentInfo =
     qualityGateValue: string,
     qualityGateColor: string,
     reliabilityValue: string,
+    reliabilityColor: string,
     securityValue: string,
+    securityColor: string,
     maintainabilityValue: string,
+    maintainabilityColor: string,
     codeSmellValue: string,
+    codeSmellColor: string,
     coverageValue: string,
     coverageColor: string
 }
@@ -64,9 +73,13 @@ function createComponentMetrics(componentList:string [], sonarMetricsList: Sonar
             qualityGateValue: filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(QUALITY_GATE)).value : null,
             qualityGateColor: null,
             reliabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(RELIABILITY)).value : null,
+            reliabilityColor: null,
             securityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(SECURITY)).value : null,
+            securityColor: null,
             maintainabilityValue: filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(MAINTAINABILITY)).value : null,
+            maintainabilityColor: null,
             codeSmellValue: filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(CODE_SMELLS)).value : null,
+            codeSmellColor: null,
             coverageValue: filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE))?.value ? filteredSonarMetricsList.find(metric => metric.metric.includes(COVERAGE)).value : null,
             coverageColor: null
         };
@@ -131,6 +144,16 @@ function fillColors(componentList:string [], componentMetrics: ComponentDict) {
         if(componentMetrics[component].qualityGateValue === GATE_FILED ){
             componentMetrics[component].qualityGateColor = LIGHT_RED;
         }
+        const reliabilityFloatValue = componentMetrics[component].reliabilityValue ? parseFloat(componentMetrics[component].reliabilityValue) : null;
+        const maintainabilityFloatValue = componentMetrics[component].maintainabilityValue ? parseFloat(componentMetrics[component].maintainabilityValue) : null;
+        const securityFloatValue = componentMetrics[component].securityValue ? parseFloat(componentMetrics[component].securityValue) : null;
+        const codeSmellFloatValue = componentMetrics[component].codeSmellValue ? parseFloat(componentMetrics[component].codeSmellValue) : null;
+
+        componentMetrics[component].reliabilityColor = reliabilityFloatValue != null ? calculateRatingColor(reliabilityFloatValue) : null;
+        componentMetrics[component].maintainabilityColor = maintainabilityFloatValue != null ? calculateRatingColor(maintainabilityFloatValue) : null;
+        componentMetrics[component].securityColor = securityFloatValue != null ? calculateRatingColor(securityFloatValue) : null;
+        componentMetrics[component].codeSmellColor = codeSmellFloatValue != null ? calculateRatingColor(codeSmellFloatValue) : null;
+
         const coverageFloatValue = componentMetrics[component].coverageValue ? parseFloat(componentMetrics[component].coverageValue) : null;
         componentMetrics[component].coverageColor = coverageFloatValue != null ? calculateCoverageColor(coverageFloatValue) : null;
     }
@@ -152,6 +175,26 @@ function calculateCoverageColor(metricValue: number) {
 
     return result
 }
+
+function calculateRatingColor(metricValue: number) {
+    let result = LIGHT_RED;
+
+    if (metricValue === 4.0) {
+        result = SONAR_ORANGE;
+    }
+    if (metricValue === 3.0) {
+        result = SONAR_YELLOW;
+    }
+    if (metricValue === 2.0) {
+        result = SONAR_GREEN_YELLOW;
+    }
+    if (metricValue === 1.0) {
+        result = DARK_GREEN;
+    }
+
+    return result
+}
+
 
 async function getMetricValues(sonarUrl: string) {
 
