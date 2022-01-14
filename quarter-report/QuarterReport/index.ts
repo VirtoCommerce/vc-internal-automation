@@ -36,6 +36,14 @@ interface ConfluencePageInfo
     }
 }
 
+interface ResultBase {
+    id: string
+}
+
+interface LongTaskResult extends ResultBase {
+    finished: boolean
+}
+
 interface FindPagesResult {
     results: [
         {
@@ -116,8 +124,8 @@ async function archivePage(pageId: string, confluenceUrl: string, login: string,
             headers: headers
         });
 
-        let apiResult = await response.json();
-        var result = apiResult?.id as string;
+        let apiResult = await response.json() as ResultBase;
+        var result = apiResult?.id;
 
         return result;
     } catch (error) {
@@ -140,8 +148,8 @@ async function checkTaskFinished(taskId: string, confluenceUrl: string, login: s
             headers: headers
         });
 
-        let apiResult = await response.json();
-        var result = apiResult?.finished as boolean;
+        let apiResult = await response.json() as LongTaskResult;
+        var result = apiResult?.finished;
 
         return result;
     } catch (error) {
@@ -254,7 +262,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             responseMessage = `Page "${pageTitle}" created.`;
         } else {
             var errorResult = await publishResult.json(); 
-            responseMessage = errorResult?.message as string ?? "Report creation error.";
+            responseMessage = errorResult['message'] as string ?? "Report creation error.";
             status =  publishResult ?  publishResult.status: 400;
         }
     } catch(error) {
