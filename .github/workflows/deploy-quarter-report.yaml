@@ -1,4 +1,4 @@
-name: Build and deploy Regression Report Azure Function App
+name: Build and deploy Quarter Report Azure Function App
 
 on:
   push:
