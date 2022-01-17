@@ -9,7 +9,7 @@ param ConfluenceLogin string
 @secure()
 param ConfluenceToken string
 
-param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api'
+param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api/content/'
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
 
 
