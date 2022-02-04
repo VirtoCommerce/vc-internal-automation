@@ -191,11 +191,8 @@ function getReportName(): string {
 }
 
 async function getReportBody(componentList:string []): Promise<string> {
-//    const result: string = await getFullSonarReport(componentList);
-//    return result;
-var date = new Date();
-return `<p>This is a new empty report from ${date.toUTCString()}.</p>`;
-
+    const result: string = await getFullSonarReport(componentList);
+    return result;
 }
 
 async function tryArchivePage(pageTitle: string, spaceKey: string, confluenceUrl: string, login: string, token: string) {

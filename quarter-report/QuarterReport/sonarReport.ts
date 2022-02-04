@@ -106,7 +106,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
         const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
         const securityColor = componentMetrics[component].securityColor ? ` bgcolor="${componentMetrics[component].securityColor}"` : '';
         const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` bgcolor="${componentMetrics[component].maintainabilityColor}"` : '';
-        const codeSmellColor = componentMetrics[component].codeSmellColor ? ` bgcolor="${componentMetrics[component].codeSmellColor}"` : '';
+        const codeSmellColor = '';
 
         pageBody += `<tr> `
         pageBody += `<td>${++ rowN}</td> `
@@ -121,7 +121,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
 
     Guard.AgainstNull(pageBody, 'pageBody');
 
-    pageBody += createPageLegend();
+//    pageBody += createPageLegend();
 
     return pageBody;
 }
