@@ -101,11 +101,17 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
 
     for(let component of componentList){
-        const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
-        const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
-        const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
-        const securityColor = componentMetrics[component].securityColor ? ` bgcolor="${componentMetrics[component].securityColor}"` : '';
-        const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` bgcolor="${componentMetrics[component].maintainabilityColor}"` : '';
+        const gateColor = '';
+        const coverageColor =  '';
+        const reliabilityColor =  '';
+        const securityColor =  '';
+        const maintainabilityColor = '';
+
+        // const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
+        // const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
+        // const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
+        // const securityColor = componentMetrics[component].securityColor ? ` bgcolor="${componentMetrics[component].securityColor}"` : '';
+        // const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` bgcolor="${componentMetrics[component].maintainabilityColor}"` : '';
         const codeSmellColor = '';
 
         pageBody += `<tr> `
