@@ -1,4 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import { getFullSonarReport } from "./sonarReport"
 import fetch from "node-fetch";
 
 const loginSecretParam = "ConfluenceLogin";
@@ -189,9 +190,9 @@ function getReportName(): string {
     return `Quarter Report ${date.getFullYear()}-Q${quarter}`;
 }
 
-function getReportBody(): string {
-    var date = new Date();
-    return `<p>This is a new empty report from ${date.toUTCString()}.</p>`;
+async function getReportBody(componentList:string []): Promise<string> {
+    const result: string = await getFullSonarReport(componentList);
+    return result;
 }
 
 async function tryArchivePage(pageTitle: string, spaceKey: string, confluenceUrl: string, login: string, token: string) {
@@ -229,7 +230,8 @@ async function tryArchivePage(pageTitle: string, spaceKey: string, confluenceUrl
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    
+    const componentList:string [] = ['VirtoCommerce_vc-build','VirtoCommerce_vc-demo-storefront','VirtoCommerce_vc-demo-theme-b2b','VirtoCommerce_vc-demo-theme-default','VirtoCommerce_vc-demo-xapi-app','VirtoCommerce_vc-module-assets','VirtoCommerce_vc-module-Authorize.Net','VirtoCommerce_vc-module-avatax','VirtoCommerce_vc-module-azure-search','VirtoCommerce_vc-module-bulk-actions','VirtoCommerce_vc-module-cart','VirtoCommerce_vc-module-catalog','VirtoCommerce_vc-module-catalog-csv-import','VirtoCommerce_vc-module-catalog-export-import','VirtoCommerce_vc-module-catalog-personalization','VirtoCommerce_vc-module-catalog-publishing','VirtoCommerce_vc-module-changes-collector','VirtoCommerce_vc-module-content','VirtoCommerce_vc-module-core','VirtoCommerce_vc-module-customer','VirtoCommerce_vc-module-customer-export-import','VirtoCommerce_vc-module-customer-review','VirtoCommerce_vc-module-customer-segments','VirtoCommerce_vc-module-demo-customer-segments','VirtoCommerce_vc-module-demo-features','VirtoCommerce_vc-module-dynamic-associations','VirtoCommerce_vc-module-elastic-search','VirtoCommerce_vc-module-event-bus','VirtoCommerce_vc-module-experience-api','VirtoCommerce_vc-module-export','VirtoCommerce_vc-module-feature-flags','VirtoCommerce_vc-module-google-ecommerce-analytics','VirtoCommerce_vc-module-image-tools','VirtoCommerce_vc-module-inventory','VirtoCommerce_vc-module-lucene-search','VirtoCommerce_vc-module-marketing','VirtoCommerce_vc-module-notification','VirtoCommerce_vc-module-order','VirtoCommerce_vc-module-pagebuilder','VirtoCommerce_vc-module-payment','VirtoCommerce_vc-module-price-export-import','VirtoCommerce_vc-module-pricing','VirtoCommerce_vc-module-profile-experience-api','VirtoCommerce_vc-module-quote','VirtoCommerce_vc-module-search','VirtoCommerce_vc-module-shipping','VirtoCommerce_vc-module-simple-export-import','VirtoCommerce_vc-module-sitemaps','VirtoCommerce_vc-module-store','VirtoCommerce_vc-module-subscription','VirtoCommerce_vc-module-tax','VirtoCommerce_vc-module-webhooks','VirtoCommerce_vc-platform','VirtoCommerce_vc-storefront','VirtoCommerce_vc-theme-b2b','VirtoCommerce_vc-theme-default'];
+
     var responseMessage = "";
     var status = 200;
 
@@ -248,7 +250,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         const pageRepresentation = "storage";
         
         const pageTitle = getReportName();
-        const pageBody = getReportBody();
+        const pageBody = await getReportBody(componentList);
         
         const confluenceContentUrl = `${confluenceUrl}/content`;
 
