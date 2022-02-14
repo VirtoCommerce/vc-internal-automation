@@ -97,7 +97,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody +=`<h3>Sonar Quality Report</h3>`
 
     pageBody += '<p></p>'
-    pageBody += '<table><tbody>'
+    pageBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
     pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
 
     for(let component of componentList){
@@ -138,23 +138,22 @@ function createPageLegend(){
     let legendBody: string = '';
 
     legendBody += '<p></p>'
-    legendBody += '<p>CodeCoverage Legend</p>'
-    legendBody += '<p></p>'
-    legendBody += `<strong>Coverage %</strong><br />`
-    legendBody += `<span style="color:${LIGHT_RED}">0%-29%</span><br />`
-    legendBody += `<span style="color:${DARK_YELLOW}">30%-49%</span><br />`
-    legendBody += `<span style="color:${LIGHT_BLUE}">50%-79%</span><br />`
-    legendBody += `<span style="color:${DARK_GREEN}">80%-100%</span><br />`
+    legendBody += '<p><strong>CodeCoverage Legend</strong></p>'
+    // legendBody += `<strong>Coverage %</strong><br />`
+    // legendBody += `<span style="color:${LIGHT_RED}">0%-29%</span><br />`
+    // legendBody += `<span style="color:${DARK_YELLOW}">30%-49%</span><br />`
+    // legendBody += `<span style="color:${LIGHT_BLUE}">50%-79%</span><br />`
+    // legendBody += `<span style="color:${DARK_GREEN}">80%-100%</span><br />`
 
-//    legendBody += '<table><tbody>'
+    legendBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
 
-//    legendBody += `<tr><th width="20%">Coverage %</tr>`
-    // legendBody += `<tr><td class="highlight-${LIGHT_RED}-legend" data-highlight-colour="${LIGHT_RED}"><span style="width:15%">0%-29%</span></td></tr>`
-    // legendBody += `<tr><td class="highlight-${DARK_YELLOW}-legend" data-highlight-colour="${DARK_YELLOW}"><span style="width:15%">30%-49%</span></td></tr>`
-    // legendBody += `<tr><td class="highlight-${LIGHT_BLUE}-legend" data-highlight-colour="${LIGHT_BLUE}"><span style="width:15%">50%-79%</span></td></tr>`
-    // legendBody += `<tr><td class="highlight-${DARK_GREEN}-legend" data-highlight-colour="${DARK_GREEN}"><span style="width:15%">80%-100%</span></td></tr>`
+    legendBody += `<tr><th>Coverage %</tr>`
+    legendBody += `<tr><td data-highlight-colour="${LIGHT_RED}">0%-29%</td></tr>`
+    legendBody += `<tr><td data-highlight-colour="${DARK_YELLOW}">30%-49%</td></tr>`
+    legendBody += `<tr><td data-highlight-colour="${LIGHT_BLUE}">50%-79%</td></tr>`
+    legendBody += `<tr><td data-highlight-colour="${DARK_GREEN}">80%-100%</td></tr>`
 
-    // legendBody += '</tbody></table>';
+    legendBody += '</tbody></table>';
 
     return legendBody;
 }
