@@ -120,6 +120,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
 
     Guard.AgainstNull(pageBody, 'pageBody');
 
+    pageBody = '';
     pageBody += createPageLegend();
 
     return pageBody;
