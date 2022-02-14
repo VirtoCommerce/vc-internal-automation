@@ -137,10 +137,10 @@ function createPageLegend(){
     legendBody += '<p>CodeCoverage Legend</p>'
     legendBody += '<table><tbody>'
 
-    legendBody += `<tr> <span style="color:${LIGHT_RED};"><td>${BULLET_SYMBOL}</td> <td>0%-29%</td></tr>`
-    legendBody += `<tr> <span style="color:${DARK_YELLOW};"><td>${BULLET_SYMBOL}</td> <td>30%-49%</td></tr>`
-    legendBody += `<tr> <span style="color:${LIGHT_BLUE};"><td>${BULLET_SYMBOL}</td> <td>50%-79%</td></tr>`
-    legendBody += `<tr> <span style="color:${DARK_GREEN};"><td>${BULLET_SYMBOL}</td> <td>80%-100%</td></tr>`
+    legendBody += `<span style="color:${LIGHT_RED};"><tr><td>${BULLET_SYMBOL}</td> <td>0%-29%</td></tr></span>`
+    legendBody += `<span style="color:${LIGHT_RED};"><tr><td>${BULLET_SYMBOL}</td> <td>30%-49%</td></tr></span>`
+    legendBody += `<span style="color:${LIGHT_BLUE};"><tr><td>${BULLET_SYMBOL}</td> <td>50%-79%</td></tr></span>`
+    legendBody += `<span style="color:${DARK_GREEN};"><tr><td>${BULLET_SYMBOL}</td> <td>80%-100%</td></tr></span>`
    
     legendBody += '</tbody></table>';
 
