@@ -147,7 +147,7 @@ function createPageLegend(){
 
     legendBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
 
-    legendBody += `<tr><th>Coverage %</tr>`
+    legendBody += `<tr><th>Coverage %</th></tr>`
     legendBody += `<tr><td data-highlight-colour="${LIGHT_RED}">0%-29%</td></tr>`
     legendBody += `<tr><td data-highlight-colour="${DARK_YELLOW}">30%-49%</td></tr>`
     legendBody += `<tr><td data-highlight-colour="${LIGHT_BLUE}">50%-79%</td></tr>`
