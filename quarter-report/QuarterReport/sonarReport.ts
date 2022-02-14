@@ -94,7 +94,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     let pageBody: string = '';
     let rowN: number = 0;
 
-    pageBody +=`<h3>Sonar Quality Report</h3>`
+    pageBody +=`<h2>Sonar Quality Report</h2>`
 
     pageBody += '<p></p>'
     pageBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
@@ -136,21 +136,16 @@ function createPageLegend(){
 
     let legendBody: string = '';
 
-    legendBody += '<p></p>'
-    legendBody += '<p><strong>CodeCoverage Legend</strong></p>'
-    // legendBody += `<strong>Coverage %</strong><br />`
-    // legendBody += `<span style="color:${LIGHT_RED}">0%-29%</span><br />`
-    // legendBody += `<span style="color:${DARK_YELLOW}">30%-49%</span><br />`
-    // legendBody += `<span style="color:${LIGHT_BLUE}">50%-79%</span><br />`
-    // legendBody += `<span style="color:${DARK_GREEN}">80%-100%</span><br />`
+    legendBody += '<p></p>';
+    legendBody += '<p><strong>CodeCoverage Legend</strong></p>';
 
-    legendBody += '<table class="wrapped relative-table" style="width: 20%;"><tbody>'
+    legendBody += '<table class="wrapped relative-table" style="width: 20%;"><tbody>';
 
-    legendBody += `<tr><th>Coverage %</th></tr>`
-    legendBody += `<tr><td data-highlight-colour="${LIGHT_RED}">0%-29%</td></tr>`
-    legendBody += `<tr><td data-highlight-colour="${DARK_YELLOW}">30%-49%</td></tr>`
-    legendBody += `<tr><td data-highlight-colour="${LIGHT_BLUE}">50%-79%</td></tr>`
-    legendBody += `<tr><td data-highlight-colour="${DARK_GREEN}">80%-100%</td></tr>`
+    legendBody += `<tr><th>Coverage %</th></tr>`;
+    legendBody += `<tr><td data-highlight-colour="${LIGHT_RED}">0%-29%</td></tr>`;
+    legendBody += `<tr><td data-highlight-colour="${DARK_YELLOW}">30%-49%</td></tr>`;
+    legendBody += `<tr><td data-highlight-colour="${LIGHT_BLUE}">50%-79%</td></tr>`;
+    legendBody += `<tr><td data-highlight-colour="${DARK_GREEN}">80%-100%</td></tr>`;
 
     legendBody += '</tbody></table>';
 
@@ -163,6 +158,10 @@ function fillColors(componentList:string [], componentMetrics: ComponentDict) {
         if(componentMetrics[component].qualityGateValue === GATE_FILED ){
             componentMetrics[component].qualityGateColor = LIGHT_RED;
         }
+        if(!componentMetrics[component].qualityGateValue){
+            componentMetrics[component].qualityGateColor = DARK_YELLOW;
+        }
+
         const reliabilityFloatValue = componentMetrics[component].reliabilityValue ? parseFloat(componentMetrics[component].reliabilityValue) : null;
         const maintainabilityFloatValue = componentMetrics[component].maintainabilityValue ? parseFloat(componentMetrics[component].maintainabilityValue) : null;
         const securityFloatValue = componentMetrics[component].securityValue ? parseFloat(componentMetrics[component].securityValue) : null;
