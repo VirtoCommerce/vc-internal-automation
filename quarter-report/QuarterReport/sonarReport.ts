@@ -123,6 +123,8 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody = '';
     pageBody += createPageLegend();
 
+    pageBody += `<hr />`
+
     return pageBody;
 }
 
@@ -138,7 +140,7 @@ function createPageLegend(){
     legendBody += '<p></p>'
     legendBody += '<table><tbody>'
 
-    legendBody += `<tr><th width="20%"><Coverage %</span></tr>`
+    legendBody += `<tr><th width="20%">Coverage %</tr>`
     // legendBody += `<tr><td class="highlight-${LIGHT_RED}-legend" data-highlight-colour="${LIGHT_RED}"><span style="width:15%">0%-29%</td></tr>`
     // legendBody += `<tr><td class="highlight-${DARK_YELLOW}-legend" data-highlight-colour="${DARK_YELLOW}"><span style="width:15%">30%-49%/td></tr>`
     // legendBody += `<tr><td class="highlight-${LIGHT_BLUE}-legend" data-highlight-colour="${LIGHT_BLUE}"><span style="width:15%">50%-79%</td></tr>`
