@@ -139,7 +139,7 @@ function createPageLegend(){
     legendBody += '<table><tbody>'
 
     legendBody += `<tr><th><span style="width:15%">Coverage %</span></th></tr>`
-    legendBody += `<tr><td class="highlight-${LIGHT_RED}-legend" data-highlight-colour="${LIGHT_RED}"><span style="width:15%">0%-29%</td></tr>`
+    legendBody += `<tr><td class="highlight-${LIGHT_RED}-legend" data-highlight-colour="${LIGHT_RED}"><span style="width:15%">0%-29%</span></td></tr>`
     legendBody += `<tr><td class="highlight-${DARK_YELLOW}-legend" data-highlight-colour="${DARK_YELLOW}"><span style="width:15%">30%-49%</span></td></tr>`
     legendBody += `<tr><td class="highlight-${LIGHT_BLUE}-legend" data-highlight-colour="${LIGHT_BLUE}"><span style="width:15%">50%-79%</span></td></tr>`
     legendBody += `<tr><td class="highlight-${DARK_GREEN}-legend" data-highlight-colour="${DARK_GREEN}"><span style="width:15%">80%-100%</span></td></tr>`
