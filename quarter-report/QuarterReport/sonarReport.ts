@@ -8,16 +8,16 @@ const CODE_SMELLS = 'code_smells'
 const COVERAGE = 'coverage'
 const GATE_FILED = 'ERROR'
 
-const LIGHT_RED = 'OrangeRed'
-const DARK_YELLOW = '#CCCC00'
-const LIGHT_BLUE = '#87CEFA'
-const DARK_GREEN = '#00CC66'
+const LIGHT_RED = 'Tomato'
+const DARK_YELLOW = 'Gold'
+const LIGHT_BLUE = 'LightSkyBlue'
+const DARK_GREEN = 'LightGreen'
 
-const SONAR_GREEN = '#6ACD6A'
-const SONAR_GREEN_YELLOW = '#B0D513'
-const SONAR_YELLOW = '#EABE06'
-const SONAR_ORANGE = '#ED7D20'
-const SONAR_RED = '#D4333F'
+const SONAR_GREEN = 'LightGreen'
+const SONAR_GREEN_YELLOW = 'GreenYellow'
+const SONAR_YELLOW = 'Gold'
+const SONAR_ORANGE = 'DarkOrange'
+const SONAR_RED = 'Tomato'
 
 const BULLET_SYMBOL = '&#8226'
 
@@ -100,17 +100,12 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
 
     for(let component of componentList){
-        const coverageColor =  '';
-        const reliabilityColor =  '';
-        const securityColor =  '';
-        const maintainabilityColor = '';
         
         const gateColor = componentMetrics[component].qualityGateColor ? ` class="highlight-${componentMetrics[component].qualityGateColor}-colour" data-highlight-colour="${componentMetrics[component].qualityGateColor}"` : '';
-        // const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
-        // const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
-        // const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
-        // const securityColor = componentMetrics[component].securityColor ? ` bgcolor="${componentMetrics[component].securityColor}"` : '';
-        // const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` bgcolor="${componentMetrics[component].maintainabilityColor}"` : '';
+        const coverageColor = componentMetrics[component].coverageColor ? ` class="highlight-${componentMetrics[component].coverageColor}-colour" data-highlight-colour="${componentMetrics[component].coverageColor}"` : '';
+        const reliabilityColor = componentMetrics[component].reliabilityColor ? ` class="highlight-${componentMetrics[component].reliabilityColor}-colour" data-highlight-colour="${componentMetrics[component].reliabilityColor}"` : '';
+        const securityColor = componentMetrics[component].securityColor ? ` class="highlight-${componentMetrics[component].securityColor}-colour" data-highlight-colour="${componentMetrics[component].securityColor}"` : '';
+        const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` class="highlight-${componentMetrics[component].maintainabilityColor}-colour" data-highlight-colour="${componentMetrics[component].maintainabilityColor}"` : '';
         const codeSmellColor = '';
 
         pageBody += `<tr> `
