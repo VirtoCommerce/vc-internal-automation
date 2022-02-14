@@ -121,7 +121,7 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
 
     Guard.AgainstNull(pageBody, 'pageBody');
 
-//    pageBody += createPageLegend();
+    pageBody += createPageLegend();
 
     return pageBody;
 }
@@ -136,38 +136,17 @@ function createPageLegend(){
     legendBody += '<p></p>'
     legendBody += '<p>CodeCoverage Legend</p>'
     legendBody += '<table><tbody>'
-    legendBody += `<tr style="color:${LIGHT_RED};"><td>${BULLET_SYMBOL}</td> <td>0%-29%</td></tr>`
-    legendBody += `<tr style="color:${DARK_YELLOW};"><td>${BULLET_SYMBOL}</td> <td>30%-49%</td></tr>`
-    legendBody += `<tr style="color:${LIGHT_BLUE};"><td>${BULLET_SYMBOL}</td> <td>50%-79%</td></tr>`
-    legendBody += `<tr style="color:${DARK_GREEN};"><td>${BULLET_SYMBOL}</td> <td>80%-100%</td></tr>`
+
+    legendBody += `<tr> <span style="color:${LIGHT_RED};"><td>${BULLET_SYMBOL}</td> <td>0%-29%</td></tr>`
+    legendBody += `<tr> <span style="color:${DARK_YELLOW};"><td>${BULLET_SYMBOL}</td> <td>30%-49%</td></tr>`
+    legendBody += `<tr> <span style="color:${LIGHT_BLUE};"><td>${BULLET_SYMBOL}</td> <td>50%-79%</td></tr>`
+    legendBody += `<tr> <span style="color:${DARK_GREEN};"><td>${BULLET_SYMBOL}</td> <td>80%-100%</td></tr>`
    
     legendBody += '</tbody></table>';
 
     return legendBody;
 }
 
-function createPageContent(componentList: SonarResponse[], metricName: string){
-
-    console.log("Creating Confluence page content");
-
-    Guard.AgainstNull(componentList, 'componentList');
-
-    let pageBody: string = '';
-    let rowN: number = 0;
-
-    pageBody += '<p></p>'
-    pageBody += '<table><tbody>'
-    pageBody += `<tr> <th>#</th> <th>Component</th> <th>${metricName}</th> </tr>`
-
-    for(let component of componentList){
-        pageBody += `<tr> <td>${++ rowN}</td> <td>${component.component}</td> <td>${component.value}</td> </tr>`
-    }
-    pageBody += '</tbody></table>';
-
-    Guard.AgainstNull(pageBody, 'pageBody');
-
-    return pageBody;
-}
 
 function fillColors(componentList:string [], componentMetrics: ComponentDict) {
     for(let component of componentList){
