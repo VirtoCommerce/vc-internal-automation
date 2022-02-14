@@ -122,7 +122,6 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
 
     Guard.AgainstNull(pageBody, 'pageBody');
 
-    pageBody = '';
     pageBody += createPageLegend();
 
     pageBody += `<hr />`
@@ -145,7 +144,7 @@ function createPageLegend(){
     // legendBody += `<span style="color:${LIGHT_BLUE}">50%-79%</span><br />`
     // legendBody += `<span style="color:${DARK_GREEN}">80%-100%</span><br />`
 
-    legendBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
+    legendBody += '<table class="wrapped relative-table" style="width: 20%;"><tbody>'
 
     legendBody += `<tr><th>Coverage %</th></tr>`
     legendBody += `<tr><td data-highlight-colour="${LIGHT_RED}">0%-29%</td></tr>`
