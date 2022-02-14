@@ -6,10 +6,9 @@ const SECURITY = 'security_rating'
 const MAINTAINABILITY = 'sqale_rating'
 const CODE_SMELLS = 'code_smells'
 const COVERAGE = 'coverage'
-const FULL_REPORT = 'full_report'
 const GATE_FILED = 'ERROR'
 
-const LIGHT_RED = '#FFCCCB'
+const LIGHT_RED = 'OrangeRed'
 const DARK_YELLOW = '#CCCC00'
 const LIGHT_BLUE = '#87CEFA'
 const DARK_GREEN = '#00CC66'
@@ -101,12 +100,12 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
 
     for(let component of componentList){
-        const gateColor = '';
         const coverageColor =  '';
         const reliabilityColor =  '';
         const securityColor =  '';
         const maintainabilityColor = '';
-
+        
+        const gateColor = componentMetrics[component].qualityGateColor ? ` class="highlight-${componentMetrics[component].qualityGateColor}-colour" data-highlight-colour="${componentMetrics[component].qualityGateColor}"` : '';
         // const gateColor = componentMetrics[component].qualityGateColor ? ` bgcolor="${componentMetrics[component].qualityGateColor}"` : '';
         // const coverageColor = componentMetrics[component].coverageColor ? ` bgcolor="${componentMetrics[component].coverageColor}"` : '';
         // const reliabilityColor = componentMetrics[component].reliabilityColor ? ` bgcolor="${componentMetrics[component].reliabilityColor}"` : '';
