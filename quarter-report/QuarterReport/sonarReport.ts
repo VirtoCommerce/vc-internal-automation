@@ -19,7 +19,8 @@ const SONAR_YELLOW = 'Gold'
 const SONAR_ORANGE = 'DarkOrange'
 const SONAR_RED = 'Tomato'
 
-const BULLET_SYMBOL = '&#8226'
+//const BULLET_SYMBOL = '&#8226'
+const BULLET_SYMBOL = ''
 
 const metricValues: string[] = [QUALITY_GATE, RELIABILITY, SECURITY, MAINTAINABILITY, CODE_SMELLS, COVERAGE]
 
