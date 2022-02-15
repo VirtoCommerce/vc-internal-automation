@@ -94,19 +94,21 @@ function createQualityPageContent(componentList:string [], componentMetrics: Com
     let pageBody: string = '';
     let rowN: number = 0;
 
-    pageBody +=`<h2>Sonar Quality Report</h2>`
+    pageBody +=`<h2>Sonar Quality Report</h2>`;
 
-    pageBody += '<p></p>'
-    pageBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
-    pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`
+    pageBody += '<p></p>';
+//    pageBody += '<table class="wrapped relative-table" style="width: 99.0%;"><tbody>'
+    
+    pageBody += `<table data-layout="default"><colgroup><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /><col style="width: 85.0px;" /></colgroup><tbody>`;
+    pageBody += `<tr> <th>#</th> <th>Component</th> <th>${QUALITY_GATE}</th> <th>${RELIABILITY}</th> <th>${SECURITY}</th> <th>${MAINTAINABILITY}</th> <th>${CODE_SMELLS}</th> <th>${COVERAGE}</th> </tr>`;
 
     for(let component of componentList){
         
-        const gateColor = componentMetrics[component].qualityGateColor ? ` class="highlight-${componentMetrics[component].qualityGateColor}-colour" data-highlight-colour="${componentMetrics[component].qualityGateColor}"` : '';
-        const coverageColor = componentMetrics[component].coverageColor ? ` class="highlight-${componentMetrics[component].coverageColor}-colour" data-highlight-colour="${componentMetrics[component].coverageColor}"` : '';
-        const reliabilityColor = componentMetrics[component].reliabilityColor ? ` class="highlight-${componentMetrics[component].reliabilityColor}-colour" data-highlight-colour="${componentMetrics[component].reliabilityColor}"` : '';
-        const securityColor = componentMetrics[component].securityColor ? ` class="highlight-${componentMetrics[component].securityColor}-colour" data-highlight-colour="${componentMetrics[component].securityColor}"` : '';
-        const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` class="highlight-${componentMetrics[component].maintainabilityColor}-colour" data-highlight-colour="${componentMetrics[component].maintainabilityColor}"` : '';
+        const gateColor = componentMetrics[component].qualityGateColor ? ` data-highlight-colour="${componentMetrics[component].qualityGateColor}"` : '';
+        const coverageColor = componentMetrics[component].coverageColor ? ` data-highlight-colour="${componentMetrics[component].coverageColor}"` : '';
+        const reliabilityColor = componentMetrics[component].reliabilityColor ? ` data-highlight-colour="${componentMetrics[component].reliabilityColor}"` : '';
+        const securityColor = componentMetrics[component].securityColor ? ` data-highlight-colour="${componentMetrics[component].securityColor}"` : '';
+        const maintainabilityColor = componentMetrics[component].maintainabilityColor ? ` data-highlight-colour="${componentMetrics[component].maintainabilityColor}"` : '';
         const codeSmellColor = '';
 
         pageBody += `<tr> `
