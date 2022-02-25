@@ -231,7 +231,7 @@ async function getMetricValues(sonarUrl: string) {
 
 function getSonarProjectsName(componentList:string []):string[] {
     const projPrefix = 'VirtoCommerce_';
-    let result: string[];
+    let result: string[] = [];
     for (const component of componentList) {
         result.push(`${projPrefix}${component}`);
     }
@@ -239,6 +239,7 @@ function getSonarProjectsName(componentList:string []):string[] {
 }
 
 export async function getFullSonarReport(componentList:string [] ):Promise<string> {
+    console.log("Creating Sonar metrics page content");
     const sonarComponentList = getSonarProjectsName(componentList);
     const componentListString = sonarComponentList.toString();
     const baseUrl = 'https://sonarcloud.io/api/measures/search';
