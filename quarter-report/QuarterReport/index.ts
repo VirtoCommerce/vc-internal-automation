@@ -1,10 +1,12 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { getFullSonarReport } from "./sonarReport"
+import { getReleasesReport } from "./releasesReport"
 import fetch from "node-fetch";
 
 const loginSecretParam = "ConfluenceLogin";
 const passwordSecretParam = "ConfluenceToken";
 const confluenceUrlParam = "ConfluenceUrl";
+const gitHubTokenParam = "GitHubToken";
 
 class Guard
 {
@@ -183,15 +185,20 @@ function getAuthorization(login: string, token: string) : string {
     return `Basic ` + Buffer.from(`${login}:${token}`).toString('base64');
 }
 
-function getReportName(): string {
-    const date = new Date(); 
-    var quarter = Math.ceil((date.getMonth() + 1) / 3); 
-
-    return `Quarter Report ${date.getFullYear()}-Q${quarter}`;
+function getQuarter(date: Date): number {
+    const quarter = Math.ceil((date.getMonth() + 1) / 3); 
+    return quarter;
 }
 
-async function getReportBody(componentList:string []): Promise<string> {
-    const result: string = await getFullSonarReport(componentList);
+function getReportName(fullYear: number, quarter: number): string {
+    return `Quarter Report ${fullYear}-Q${quarter}`;
+}
+
+async function getReportBody(componentList:string [], year: number, quarter: number, gitHubToken: string): Promise<string> {
+    const owner = 'VirtoCommerce';
+    let result: string;
+    result = await getFullSonarReport(componentList);
+    result += await getReleasesReport (componentList, owner, year, quarter, gitHubToken)
     return result;
 }
 
@@ -230,7 +237,7 @@ async function tryArchivePage(pageTitle: string, spaceKey: string, confluenceUrl
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    const componentList:string [] = ['VirtoCommerce_vc-build','VirtoCommerce_vc-demo-storefront','VirtoCommerce_vc-demo-theme-b2b','VirtoCommerce_vc-demo-theme-default','VirtoCommerce_vc-demo-xapi-app','VirtoCommerce_vc-module-assets','VirtoCommerce_vc-module-Authorize.Net','VirtoCommerce_vc-module-avatax','VirtoCommerce_vc-module-azure-search','VirtoCommerce_vc-module-bulk-actions','VirtoCommerce_vc-module-cart','VirtoCommerce_vc-module-catalog','VirtoCommerce_vc-module-catalog-csv-import','VirtoCommerce_vc-module-catalog-export-import','VirtoCommerce_vc-module-catalog-personalization','VirtoCommerce_vc-module-catalog-publishing','VirtoCommerce_vc-module-changes-collector','VirtoCommerce_vc-module-content','VirtoCommerce_vc-module-core','VirtoCommerce_vc-module-customer','VirtoCommerce_vc-module-customer-export-import','VirtoCommerce_vc-module-customer-review','VirtoCommerce_vc-module-customer-segments','VirtoCommerce_vc-module-demo-customer-segments','VirtoCommerce_vc-module-demo-features','VirtoCommerce_vc-module-dynamic-associations','VirtoCommerce_vc-module-elastic-search','VirtoCommerce_vc-module-event-bus','VirtoCommerce_vc-module-experience-api','VirtoCommerce_vc-module-export','VirtoCommerce_vc-module-feature-flags','VirtoCommerce_vc-module-google-ecommerce-analytics','VirtoCommerce_vc-module-image-tools','VirtoCommerce_vc-module-inventory','VirtoCommerce_vc-module-lucene-search','VirtoCommerce_vc-module-marketing','VirtoCommerce_vc-module-notification','VirtoCommerce_vc-module-order','VirtoCommerce_vc-module-pagebuilder','VirtoCommerce_vc-module-payment','VirtoCommerce_vc-module-price-export-import','VirtoCommerce_vc-module-pricing','VirtoCommerce_vc-module-profile-experience-api','VirtoCommerce_vc-module-quote','VirtoCommerce_vc-module-search','VirtoCommerce_vc-module-shipping','VirtoCommerce_vc-module-simple-export-import','VirtoCommerce_vc-module-sitemaps','VirtoCommerce_vc-module-store','VirtoCommerce_vc-module-subscription','VirtoCommerce_vc-module-tax','VirtoCommerce_vc-module-webhooks','VirtoCommerce_vc-platform','VirtoCommerce_vc-storefront','VirtoCommerce_vc-theme-b2b','VirtoCommerce_vc-theme-default'];
+    const componentList:string [] = ['vc-module-assets','vc-module-Authorize.Net','vc-module-avatax','vc-module-azure-search','vc-module-bulk-actions','vc-module-cart','vc-module-catalog','vc-module-catalog-csv-import','vc-module-catalog-export-import','vc-module-catalog-personalization','vc-module-catalog-publishing','vc-module-changes-collector','vc-module-content','vc-module-core','vc-module-customer','vc-module-customer-export-import','vc-module-customer-review','vc-module-customer-segments','vc-module-demo-customer-segments','vc-module-demo-features','vc-module-dynamic-associations','vc-module-elastic-search','vc-module-event-bus','vc-module-experience-api','vc-module-export','vc-module-feature-flags','vc-module-google-ecommerce-analytics','vc-module-image-tools','vc-module-inventory','vc-module-lucene-search','vc-module-marketing','vc-module-notification','vc-module-order','vc-module-pagebuilder','vc-module-payment','vc-module-price-export-import','vc-module-pricing','vc-module-profile-experience-api','vc-module-quote','vc-module-search','vc-module-shipping','vc-module-simple-export-import','vc-module-sitemaps','vc-module-store','vc-module-subscription','vc-module-tax','vc-module-webhooks','vc-platform','vc-storefront','vc-theme-b2b','vc-theme-default'];
 
     var responseMessage = "";
     var status = 200;
@@ -242,6 +249,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         Guard.AgainstNull(token, passwordSecretParam); 
         const confluenceUrl = process.env[confluenceUrlParam];
         Guard.AgainstNull(confluenceUrl, confluenceUrlParam);
+        const gitHubToken = process.env[gitHubTokenParam];
+        Guard.AgainstNull(gitHubToken, gitHubTokenParam);
 
         const spaceKey = req?.body?.spaceKey ?? "DE";
         const subPageId = req?.body?.subPageId ?? 2339700737
@@ -249,8 +258,11 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         const pageType = "page";
         const pageRepresentation = "storage";
         
-        const pageTitle = getReportName();
-        const pageBody = await getReportBody(componentList);
+        const date = new Date();
+        const quarter = getQuarter(date);
+        const year = date.getFullYear();
+        const pageTitle = getReportName(year, quarter);
+        const pageBody = await getReportBody(componentList, year, quarter, gitHubToken);
         
         const confluenceContentUrl = `${confluenceUrl}/content`;
 

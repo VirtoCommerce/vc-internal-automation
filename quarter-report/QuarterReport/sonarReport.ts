@@ -229,16 +229,25 @@ async function getMetricValues(sonarUrl: string) {
     return result['measures'];
 }
 
+function getSonarProjectsName(componentList:string []):string[] {
+    const projPrefix = 'VirtoCommerce_';
+    let result: string[];
+    for (const component of componentList) {
+        result.push(`${projPrefix}${component}`);
+    }
+    return result;
+}
 
 export async function getFullSonarReport(componentList:string [] ):Promise<string> {
-    const componentListString = componentList.toString();
+    const sonarComponentList = getSonarProjectsName(componentList);
+    const componentListString = sonarComponentList.toString();
     const baseUrl = 'https://sonarcloud.io/api/measures/search';
     const queryUrl: string = `${baseUrl}?projectKeys=${componentListString}&metricKeys=${metricValues.toString()}`
     const metricsList: SonarResponse[] = await getMetricValues(queryUrl);
 
-    let componentMetrics = createComponentMetrics(componentList,metricsList);
-    componentMetrics = fillColors(componentList, componentMetrics);
-    const pageContent = createQualityPageContent(componentList,componentMetrics);
+    let componentMetrics = createComponentMetrics(sonarComponentList,metricsList);
+    componentMetrics = fillColors(sonarComponentList, componentMetrics);
+    const pageContent = createQualityPageContent(sonarComponentList,componentMetrics);
     return pageContent;
 }
 
