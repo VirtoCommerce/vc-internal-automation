@@ -8,6 +8,8 @@ param location string = resourceGroup().location
 param ConfluenceLogin string 
 @secure()
 param ConfluenceToken string
+@secure()
+param GitHubToken string
 
 param ConfluenceUrl string = 'https://virtocommerce.atlassian.net/wiki/rest/api'
 param JiraUrl string = 'https://virtocommerce.atlassian.net/rest/api/3/'
@@ -95,6 +97,10 @@ resource functionApp 'Microsoft.Web/sites@2021-01-15' = {
         {
           name: 'ConfluenceToken'
           value: ConfluenceToken
+        }
+        {
+          name: 'GitHubToken'
+          value: GitHubToken
         }
         {
           name: 'ConfluenceUrl'
