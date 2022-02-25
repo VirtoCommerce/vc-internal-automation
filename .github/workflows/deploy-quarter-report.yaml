@@ -70,6 +70,7 @@ jobs:
           --template-file ./${{ env.PACKAGE_NAME }}/main.bicep \
           --parameters ConfluenceLogin=${{ secrets.CONFLUENCE_LOGIN }} \
           ConfluenceToken=${{ secrets.CONFLUENCE_TOKEN }} \
+          GitHubToken=${{ secrets.GH_PAT }} \
           functionAppName=${{ env.FUNCTION_APP_NAME }}"
           az deployment group create $azure_cfg
 
