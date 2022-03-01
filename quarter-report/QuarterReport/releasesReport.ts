@@ -26,7 +26,7 @@ function getQuarterBorders(fullYear: number, quarter: number){
     }
 }
 
-async function countReleasesForPeriod(owner: string, repo: string, from: string, to: string, gitHubToken): Promise<number> {
+async function countReleasesForPeriod(owner: string, repo: string, from: string, to: string, gitHubToken) {
     const octokit = new Octokit({
         auth: `${gitHubToken}`,
       });
@@ -34,6 +34,7 @@ async function countReleasesForPeriod(owner: string, repo: string, from: string,
     let releaseCount: number = 0;
     const per_page: number = 100;
     let page: number = 1;
+    let releasesLinks: string [] = [];
     
     const releases = await octokit.rest.repos.listReleases({
         owner,
@@ -45,11 +46,12 @@ async function countReleasesForPeriod(owner: string, repo: string, from: string,
         releases['data'].forEach( release => {
             if (release['created_at']> from && release['created_at'] < to) {
                 releaseCount ++;
+                releasesLinks.push(`<a href="${release['html_url']}" target="_blank">${release['name']}</a> `)
             } 
         });
     }
 
-    return releaseCount;
+    return {releaseCount, releasesLinks} ;
 }
 
 async function createReleasePageContent(componentList:string [], owner: string, from: string, to: string, gitHubToken){
@@ -60,15 +62,15 @@ async function createReleasePageContent(componentList:string [], owner: string, 
     pageBody +=`<h2>Releases Report</h2>`;
     pageBody += '<p></p>';
     pageBody += `<table data-layout="default"><tbody>`;
-    pageBody += `<tr><th>#</th><th>Component</th> <th>Releases count</th></tr>`;
+    pageBody += `<tr><th>#</th><th>Component</th> <th>Releases count</th> <th>Releases links</th></tr>`;
 
 
     for (const repo of componentList) {
-        let releaseCount = await countReleasesForPeriod(owner, repo, from, to, gitHubToken)
+        let releaseInfo = await countReleasesForPeriod(owner, repo, from, to, gitHubToken);
 
         pageBody += `<tr>`;
-        pageBody += `<td>${++ rowN}</td>`
-        pageBody += `<td>${repo}</td> <td>${releaseCount}</td>`
+        pageBody += `<td>${++ rowN}</td>`;
+        pageBody += `<td>${repo}</td> <td>${releaseInfo.releaseCount}</td> <td>${releaseInfo.releasesLinks.toString()}</td>`;
         pageBody += `</tr>`;
     }
 
