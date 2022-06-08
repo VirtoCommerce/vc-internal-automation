@@ -196,9 +196,6 @@
                         },
                         "summary": "Code Review: @{items('For_each').title}",
                         "description": "Pull Request: @{items('For_each').html_url}\nTitle: @{items('For_each').title}",
-                        "priority": {
-                          "id": "1"
-                        },
                         "labels": "Operations"
                       }
                     },
