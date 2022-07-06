@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_github_jira_pr_name": {
+            "value": "github-jira-pr"
+        },
+        "workflows_github-jira-pr_parameters_$connections": {
+            "value": {
+                "jira": {
+                    "connectionId": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/resourceGroups/vc-internal-automation/providers/Microsoft.Web/connections/jira",
+                    "connectionName": "jira",
+                    "id": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/providers/Microsoft.Web/locations/westeurope/managedApis/jira"
+                }
+            }
+        },
+        "workflows_github-jira-pr_parameters_github_authorization_header": {
+            "value": ""
+        },
+        "workflows_github-jira-pr_parameters_github_org": {
+            "value": "VirtoCommerce"
+        },
+        "workflows_github-jira-pr_parameters_github_team": {
+            "value": "platform"
+        },
+        "workflows_github-jira-pr_parameters_github_team_storefront": {
+            "value": "storefront-team"
+        },
+        "workflows_github-jira-pr_parameters_jira_instance": {
+            "value": "https://virtocommerce.atlassian.net"
+        },
+        "workflows_github-jira-pr_parameters_jira_issuetype": {
+            "value": "10160"
+        },
+        "workflows_github-jira-pr_parameters_jira_issuetype_storefront": {
+            "value": "10160"
+        },
+        "workflows_github-jira-pr_parameters_jira_project": {
+            "value": "PT"
+        },
+        "workflows_github-jira-pr_parameters_jira_project_storefront": {
+            "value": "PT"
+        },
+        "workflows_github-jira-pr_parameters_review_task_label": {
+            "value": "review task created"
+        }
+    }
+}

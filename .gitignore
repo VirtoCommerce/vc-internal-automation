@@ -461,3 +461,6 @@ local.settings.json
 .vscode/launch.json
 .vscode/settings.json
 .vscode/tasks.json
+
+#Secrets
+.secret*
