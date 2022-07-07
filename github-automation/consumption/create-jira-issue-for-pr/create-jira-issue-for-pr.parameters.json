@@ -6,13 +6,7 @@
             "value": "github-jira-pr"
         },
         "workflows_github-jira-pr_parameters_$connections": {
-            "value": {
-                "jira": {
-                    "connectionId": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/resourceGroups/vc-internal-automation/providers/Microsoft.Web/connections/jira",
-                    "connectionName": "jira",
-                    "id": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/providers/Microsoft.Web/locations/westeurope/managedApis/jira"
-                }
-            }
+            "value": {}
         },
         "workflows_github-jira-pr_parameters_github_authorization_header": {
             "value": ""

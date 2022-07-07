@@ -7,13 +7,7 @@
             "type": "string"
         },
         "workflows_github-jira-pr_parameters_$connections": {
-            "defaultValue": {
-                "jira": {
-                    "connectionId": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/resourceGroups/vc-internal-automation/providers/Microsoft.Web/connections/jira",
-                    "connectionName": "jira",
-                    "id": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/providers/Microsoft.Web/locations/westeurope/managedApis/jira"
-                }
-            },
+            "defaultValue": {},
             "type": "Object"
         },
         "workflows_github-jira-pr_parameters_github_authorization_header": {
@@ -69,12 +63,7 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "$connections": {
-                            "defaultValue": {
-                                "jira": {
-                                    "connectionId": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/resourceGroups/vc-internal-automation/providers/Microsoft.Web/connections/jira",
-                                    "connectionName": "jira",
-                                    "id": "/subscriptions/865280ac-6a6b-46b2-a9cd-278d963787db/providers/Microsoft.Web/locations/westeurope/managedApis/jira"
-                                }
+                            "defaultValue": {}
                             },
                             "type": "Object"
                         },
