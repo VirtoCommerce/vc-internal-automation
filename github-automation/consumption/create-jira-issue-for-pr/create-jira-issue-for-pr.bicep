@@ -15,6 +15,10 @@ param jiraConnection object
 @secure()
 param githubAuthorizationHeader string
 
+@secure()
+param githubAuthorizationHeaderMembership string
+
+
 var logicAppDefinition = loadJsonContent('create-jira-issue-for-pr.definition.json')
 
 resource stg 'Microsoft.Logic/workflows@2019-05-01' = {
@@ -32,6 +36,9 @@ resource stg 'Microsoft.Logic/workflows@2019-05-01' = {
       github_authorization_header: {
           value: githubAuthorizationHeader
       }
+      github_authorization_header_membership: {
+        value: githubAuthorizationHeaderMembership
+     }
       github_org: {
           value: githubOrg
       }

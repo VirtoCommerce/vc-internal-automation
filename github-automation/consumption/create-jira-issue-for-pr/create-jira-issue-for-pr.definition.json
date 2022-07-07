@@ -1420,7 +1420,7 @@
                                     "type": "Http",
                                     "inputs": {
                                         "headers": {
-                                            "Authorization": "token @{parameters('github_authorization_header')}"
+                                            "Authorization": "token @{parameters('github_authorization_header_membership')}"
                                         },
                                         "method": "GET",
                                         "uri": "https://api.github.com/orgs/@{parameters('github_org')}/teams/@{variables('issueParams')['team']}/memberships/@{triggerBody()?['pull_request']?['user']?['login']}"
