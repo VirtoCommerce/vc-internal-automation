@@ -462,5 +462,9 @@ local.settings.json
 .vscode/settings.json
 .vscode/tasks.json
 
-#Secrets
+# Secrets
 .secret*
+
+# Service
+.http
+.azcli
