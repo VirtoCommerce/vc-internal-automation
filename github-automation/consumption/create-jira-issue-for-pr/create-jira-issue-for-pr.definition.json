@@ -75,6 +75,10 @@
                             "defaultValue": "",
                             "type": "SecureString"
                         },
+                        "github_authorization_header_membership": {
+                            "defaultValue": "",
+                            "type": "SecureString"
+                        },
                         "github_org": {
                             "defaultValue": "VirtoCommerce",
                             "type": "String"
