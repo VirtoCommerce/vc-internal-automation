@@ -1537,7 +1537,7 @@
                                                     "name": "issueParams",
                                                     "value": {
                                                         "jiraIssueType": "@{parameters('jira_issuetype')}",
-                                                        "jiraProject": "@{parameters('github_team')}",
+                                                        "jiraProject": "@{parameters('jira_project')}",
                                                         "team": "@{parameters('github_team')}"
                                                     }
                                                 }
