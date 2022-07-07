@@ -1,0 +1,37 @@
+name: Deploy create-jira-issue-for-pr Logic App
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'github-automation/consumption/create-jira-issue-for-pr/**'
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+      if: github.ref == 'refs/heads/master'
+      environment:
+        name: production
+      runs-on: ubuntu-latest
+      steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          enable-AzPSSession: true
+
+      - name: Azure create-jira-issue-for-pr  Logic App deploy
+        working-directory: './github-automation/consumption/create-jira-issue-for-pr/'
+        run: |
+          azure_cfg="--resource-group ${{ secrets.LA_RESOURCE_GROUP }} \
+          --template-file ./create-jira-issue-for-pr.bicep \
+          --parameters integrationAccountId= ${{ secrets.LA_INTEGRATION_ACCOUNT }} \
+          githubAuthorizationHeader=${{ secrets.REPO_TOKEN }} \
+          jiraConnection=${{ secrets.JIRA_LA_CONNECTION }}"
+          az deployment group create $azure_cfg
+

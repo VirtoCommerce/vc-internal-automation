@@ -30,7 +30,7 @@ az deployment group create
 --parameters reviewTaskLabel="review task created"
 --parameters integrationAccountId="/subscriptions/subscription-id/resourceGroups/your-resource-group/providers/Microsoft.Logic/integrationAccounts/your-integration-account"
 --parameters githubAuthorizationHeader="your_github_token"
---parameters jiraConnection "{ jira: {connectionId:'/subscriptions/subscription-id/resourceGroups/your-resource-group/providers/Microsoft.Web/connections/jira' connectionName:'jira' id: '/subscriptions/subscription-id/providers/Microsoft.Web/locations/your-location/managedApis/jira'}}"
+--parameters jiraConnection="{ jira: {connectionId:'/subscriptions/subscription-id/resourceGroups/your-resource-group/providers/Microsoft.Web/connections/jira' connectionName:'jira' id: '/subscriptions/subscription-id/providers/Microsoft.Web/locations/your-location/managedApis/jira'}}"
 ```
 
 ## Link repository
