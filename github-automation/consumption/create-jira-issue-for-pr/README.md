@@ -6,7 +6,7 @@ This Logic App creates a Jira Issue of type "Review" to review new pull requests
 
 ## Features
 
-* Creates a new issue of type "Review" for all new pull requests
+* Creates a new issue of type "Review" for all new pull requests where author is not in VirtoCommerce\platform or VirtoCommerce\storefront-team (optional) team and title not contain any Jira key like JIRA-123.
 * Adds label "review task created"
 * Adds comment with a link to Jira Issue
 
