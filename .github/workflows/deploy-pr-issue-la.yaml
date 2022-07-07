@@ -30,7 +30,7 @@ jobs:
         run: |
           azure_cfg="--resource-group ${{ secrets.LA_RESOURCE_GROUP }} \
           --template-file ./create-jira-issue-for-pr.bicep \
-          --parameters integrationAccountId= ${{ secrets.LA_INTEGRATION_ACCOUNT }} \
+          --parameters integrationAccountId=${{ secrets.LA_INTEGRATION_ACCOUNT }} \
           githubAuthorizationHeader=${{ secrets.REPO_TOKEN }} \
           jiraConnection=${{ secrets.JIRA_LA_CONNECTION }}"
           az deployment group create $azure_cfg
