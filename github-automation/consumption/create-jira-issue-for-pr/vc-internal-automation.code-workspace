@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\.."
+		},
+		{
+			"name": "github-automation",
+			"path": "..\\.."
+		},
+		{
+			"name": "consumption",
+			"path": ".."
+		}
+	],
+    "settings": {
+        "debug.internalConsoleOptions": "neverOpen"
+    }
+}

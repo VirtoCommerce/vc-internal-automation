@@ -12,6 +12,6 @@ We decided to use LogicApp for building workflows. The workflows sources, artifa
 * [Fill in Operational Funnel in Jira](/move-issues-to-funnel-state/README.md)
 * [Platform V3 Tools](/platform-v3-tools/README.md)
 * [Sync GitHub - Jira issues](/sync-jira-github-issues/README.md)
-* [Create Jira Issue of type "Review" to review new pull requests](/create-jira-issue-for-pull-request/README.md)
+* [Create Jira Issue of type "Review" to review new pull requests](/github-automation/consumption/create-jira-issue-for-pr/README.md)
 * [Copy Jira Issue attachments](copy-jira-issue-attachments/README.md)
 * [VC Platform webhook test](webhook-test/README.md)
