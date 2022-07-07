@@ -14,6 +14,11 @@
             "defaultValue": "",
             "type": "SecureString"
         },
+        "workflows_github-jira-pr_parameters_github_authorization_header_membership": {
+            "defaultValue": "",
+            "type": "SecureString"
+        },
+
         "workflows_github-jira-pr_parameters_github_org": {
             "defaultValue": "VirtoCommerce",
             "type": "String"
@@ -1638,6 +1643,9 @@
                     },
                     "github_authorization_header": {
                         "value": "[parameters('workflows_github-jira-pr_parameters_github_authorization_header')]"
+                    },
+                    "github_authorization_header_membership": {
+                        "value": "[parameters('workflows_github-jira-pr_parameters_github_authorization_header_membership')]"
                     },
                     "github_org": {
                         "value": "[parameters('workflows_github-jira-pr_parameters_github_org')]"
