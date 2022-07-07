@@ -63,8 +63,7 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "$connections": {
-                            "defaultValue": {}
-                            },
+                            "defaultValue": {},
                             "type": "Object"
                         },
                         "github_authorization_header": {
